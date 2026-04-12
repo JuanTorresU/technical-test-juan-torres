@@ -69,7 +69,8 @@
       font-weight: 600;
       color: #e2e8f0;
       margin: 0;
-      word-break: break-all;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
     .sub-badge {
       background: rgba(16, 185, 129, 0.2);
@@ -105,6 +106,9 @@
       .value.highlight {
         font-size: 1.25rem;
         color: #3b82f6;
+      }
+      .value.notification {
+        text-transform: uppercase;
       }
     }
   }

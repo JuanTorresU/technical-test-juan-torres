@@ -24,12 +24,12 @@
             </div>
             <div class="detail-row">
               <span class="label">Notificación Preferida</span>
-              <span class="value" style="text-transform: uppercase;">{{ sub.notification }}</span>
+              <span class="value notification">{{ sub.notification }}</span>
             </div>
           </div>
 
           <div class="sub-actions">
-            <button class="btn-cancel" (click)="openConfirm(sub)">
+            <button class="btn-cancel" (click)="openConfirm(sub)" [disabled]="isCancelling()">
               Cancelar Inversión
             </button>
           </div>
@@ -49,7 +49,7 @@
 <app-confirm-dialog
   [visible]="showConfirmDialog()"
   [title]="'Confirmar Cancelación'"
-  [message]="'¿Estás seguro que deseas cancelar tu fondo ' + (fundToCancel()?.fund?.name || '') + '? El monto de ' + ((fundToCancel()?.amount | currencyCop) || '') + ' será reintegrado a tu saldo disponible inmediatamente.'"
+  [message]="confirmMessage()"
   (confirmed)="executeCancellation()"
   (cancelled)="cancelDialog()">
 </app-confirm-dialog>
