@@ -22,12 +22,12 @@
               <strong>{{ tx.fundName }}</strong>
             </td>
             <td data-label="Movimiento">
-              <span class="badge {{ tx.type === 'subscription' ? 'badge-blue' : 'badge-green' }}">
+              <span class="badge" [class.badge-blue]="tx.type === 'subscription'" [class.badge-green]="tx.type === 'cancellation'">
                 {{ tx.type === 'subscription' ? '💸 Suscrito' : '💰 Devuelto' }}
               </span>
             </td>
             <td data-label="Monto">
-              <span class="amount-highlight" [style.color]="tx.type === 'subscription' ? '#e2e8f0' : '#34d399'">
+              <span class="amount-highlight" [class.amount-debit]="tx.type === 'subscription'" [class.amount-credit]="tx.type === 'cancellation'">
                 {{ tx.type === 'subscription' ? '-' : '+' }} {{ tx.amount | currencyCop }}
               </span>
             </td>

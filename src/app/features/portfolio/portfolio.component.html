@@ -26,18 +26,17 @@
               <span class="badge badge-green">{{ sub.fund.category }}</span>
             </td>
             <td data-label="Monto Invertido">
-              <span class="amount-highlight" style="color: #60a5fa;">{{ sub.amount | currencyCop }}</span>
+              <span class="amount-highlight amount-blue">{{ sub.amount | currencyCop }}</span>
             </td>
             <td data-label="Fecha Inicio">
               {{ sub.subscribedAt | date:'mediumDate' }}
             </td>
             <td data-label="Notificación">
-              <span style="text-transform: uppercase; font-size: 0.85rem;">{{ sub.notification }}</span>
+              <span class="text-upper">{{ sub.notification }}</span>
             </td>
             <td data-label="">
               <button 
-                class="btn btn-danger" 
-                style="width: 100%; max-width: 200px;"
+                class="btn btn-danger w-full-max-200" 
                 (click)="openConfirm(sub)" 
                 [disabled]="isCancelling()">
                 Cancelar Inversión

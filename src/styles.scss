@@ -114,6 +114,33 @@ body {
   p { margin: 0; color: #94a3b8; }
 }
 
+/* Utility Classes */
+.w-full-max-200 { width: 100%; max-width: 200px; }
+.text-upper { text-transform: uppercase; font-size: 0.85rem; }
+
+.badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  
+  &.badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+  &.badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+  &.badge-gray { background: rgba(100, 116, 139, 0.2); color: #94a3b8; }
+}
+
+.amount-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #f8fafc;
+  
+  &.amount-blue { color: #60a5fa; }
+  &.amount-debit { color: #e2e8f0; }
+  &.amount-credit { color: #34d399; }
+}
+
 /* === Responsive Table Pattern === */
 .responsive-table {
   width: 100%;
@@ -153,24 +180,7 @@ body {
     }
   }
 
-  /* Badge and text helpers inside tables */
-  .badge {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    
-    &.badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-    &.badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    &.badge-gray { background: rgba(100, 116, 139, 0.2); color: #94a3b8; }
-  }
 
-  .amount-highlight {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #f8fafc;
-  }
 }
 
 /* Base tablet optimizations: Allow table but potentially break things smoothly or hide less important headers */
