@@ -1,0 +1,58 @@
+<div class="portfolio-container">
+  <header class="portfolio-header">
+    <h2>Mi Portafolio</h2>
+    <p>Gestiona tus suscripciones activas y mantén el control de tus rendimientos.</p>
+  </header>
+
+  @if (store.subscriptions().length > 0) {
+    <div class="subs-grid">
+      @for (sub of store.subscriptions(); track sub.fund.id) {
+        <article class="sub-card">
+          <div class="sub-header">
+            <h3 class="sub-name">{{ sub.fund.name }}</h3>
+            <span class="sub-badge">{{ sub.fund.category }}</span>
+          </div>
+          
+          <div class="sub-details">
+            <div class="detail-row">
+              <span class="label">Monto Invertido</span>
+              <strong class="value highlight">{{ sub.amount | currencyCop }}</strong>
+            </div>
+            <div class="detail-row">
+              <span class="label">Fecha Inicio</span>
+              <span class="value">{{ sub.subscribedAt | date:'mediumDate' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Notificación Preferida</span>
+              <span class="value" style="text-transform: uppercase;">{{ sub.notification }}</span>
+            </div>
+          </div>
+
+          <div class="sub-actions">
+            <button class="btn-cancel" (click)="openConfirm(sub)">
+              Cancelar Inversión
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon">📂</span>
+      <h3>Aún no tienes inversiones</h3>
+      <p>Dirígete al catálogo para suscribirte a tu primer fondo y verás aquí tus rendimientos.</p>
+    </div>
+  }
+</div>
+
+<!-- Modal de Confirmacion -->
+<app-confirm-dialog
+  [visible]="showConfirmDialog()"
+  [title]="'Confirmar Cancelación'"
+  [message]="'¿Estás seguro que deseas cancelar tu fondo ' + (fundToCancel()?.fund?.name || '') + '? El monto de ' + ((fundToCancel()?.amount | currencyCop) || '') + ' será reintegrado a tu saldo disponible inmediatamente.'"
+  (confirmed)="executeCancellation()"
+  (cancelled)="cancelDialog()">
+</app-confirm-dialog>
+
+<!-- Toast Feedback -->
+<app-toast [(visible)]="toastVisible" [message]="toastMessage()" [type]="toastType()"></app-toast>
