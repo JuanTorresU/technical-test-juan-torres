@@ -36,12 +36,48 @@ Ejecutar la suite de pruebas unitarias implementada (ej. `investment.store.spec.
 npm run test
 ```
 
-## Configuración y Deploy a AWS Amplify
-El despliegue está pensado y configurado para conectarse directamente a la rama via AWS Amplify. 
-Paso principal: Conectar el repositorio y utilizar las siguientes especificaciones base:
-- **Build Command:** `npm run build`
-- **Base Directory:** `dist/technical-test-funds-app/browser` (o según se verifique el build en Angular 17).
-La plataforma configurará automáticamente el Rewrite 200 hacia `index.html`.
+## Configuración y Deploy a AWS Amplify (Fase 13)
+
+El despliegue está pensado y configurado para conectarse directamente a la rama de GitHub/GitLab/Bitbucket vía **AWS Amplify Hosting**. 
+
+Para facilitar el despliegue automático, se ha incluido el archivo `amplify.yml` en la raíz del proyecto. Este archivo contiene la configuración necesaria para instalar dependencias y construir el proyecto:
+
+```yaml
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist/technical-test-funds-app/browser
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+```
+
+### Paso a paso del Deploy:
+1. Sube este repositorio a un proveedor compatible (ej. GitHub, GitLab).
+2. Entra a la consola de **AWS Amplify** y selecciona **Host web app**.
+3. Conecta el repositorio e indica la rama principal (`main` o `master`).
+4. Amplify detectará automáticamente el archivo `amplify.yml`.
+5. Procede a crear la aplicación y espera a que termine el build y el deploy inicial.
+
+### Configuración de Rewrites (Importante para la SPA):
+Dado que es una Single Page Application, debes configurar una regla de **Rewrites and redirects** en la consola de Amplify para evitar errores `404` al recargar páginas o acceder a rutas directamente:
+
+1. Ve a "App settings" > "Rewrites and redirects".
+2. Añade la siguiente regla:
+   - **Source address:** `</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json|webp)$)([^.]+$)/>`
+   - **Target address:** `/index.html`
+   - **Type:** `200 (Rewrite)`
+
+---
 
 ## URL Desplegada
-*Pendiente.*
+*Pendiente.*  *(Reemplazar con la URL generada por AWS Amplify)*
