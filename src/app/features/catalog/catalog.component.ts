@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { InvestmentStore } from '../../state/investment.store';
@@ -24,17 +24,17 @@ export class CatalogComponent implements OnInit {
   readonly store = inject(InvestmentStore);
   private fb = inject(FormBuilder);
 
+  @ViewChild('amountInput') amountInput!: ElementRef<HTMLInputElement>;
+
   // Local State
   isModalOpen = signal(false);
   selectedFund = signal<Fund | null>(null);
   isProcessing = signal(false);
 
-  // Toast State
-  toastState = {
-    visible: false,
-    message: '',
-    type: 'info' as 'success' | 'error' | 'info'
-  };
+  // Reactive Toast State via Signals
+  toastVisible = signal(false);
+  toastMessage = signal('');
+  toastType = signal<'success' | 'error' | 'info'>('info');
 
   subscribeForm: FormGroup;
 
@@ -46,9 +46,15 @@ export class CatalogComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Only load if empty, avoids re-fetching purely active mock delays if we already have it
     if (this.store.funds().length === 0) {
       this.store.loadFunds();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.isModalOpen()) {
+      this.closeModal();
     }
   }
 
@@ -59,7 +65,6 @@ export class CatalogComponent implements OnInit {
       notification: ''
     });
 
-    // Update validators dynamically
     this.subscribeForm.get('amount')?.setValidators([
       Validators.required,
       Validators.min(fund.minimumAmount),
@@ -68,6 +73,13 @@ export class CatalogComponent implements OnInit {
     this.subscribeForm.get('amount')?.updateValueAndValidity();
 
     this.isModalOpen.set(true);
+
+    // Focus input after render
+    setTimeout(() => {
+      if (this.amountInput?.nativeElement) {
+        this.amountInput.nativeElement.focus();
+      }
+    }, 50);
   }
 
   closeModal() {
@@ -77,11 +89,9 @@ export class CatalogComponent implements OnInit {
   }
 
   showToast(message: string, type: 'success' | 'error' | 'info') {
-    // We reassign object completely or by properties, 
-    // to trigger change detection cleanly if mutating properties manually
-    this.toastState.message = message;
-    this.toastState.type = type;
-    this.toastState.visible = true;
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    this.toastVisible.set(true);
   }
 
   onSubmit() {

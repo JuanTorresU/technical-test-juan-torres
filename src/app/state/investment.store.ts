@@ -1,5 +1,5 @@
-import { Injectable, signal, computed, inject, effect } from '@angular/core';
-import { finalize, catchError, EMPTY } from 'rxjs';
+import { Injectable, signal, computed, inject, OnDestroy, effect } from '@angular/core';
+import { finalize, catchError, EMPTY, debounceTime, Subject, takeUntil } from 'rxjs';
 import { FundRepository } from '../core/repositories/fund.repository';
 import { PersistenceService } from '../core/services/persistence.service';
 import { 
@@ -14,9 +14,15 @@ import { INITIAL_BALANCE } from '../core/data/funds.mock';
 @Injectable({
   providedIn: 'root'
 })
-export class InvestmentStore {
+export class InvestmentStore implements OnDestroy {
   private readonly fundRepository = inject(FundRepository);
   private readonly persistenceService = inject(PersistenceService);
+
+  // RxJS Subjects para control de Memory Leaks y Debounce de localStorage
+  private readonly destroy$ = new Subject<void>();
+  private readonly balance$ = new Subject<number>();
+  private readonly subs$ = new Subject<ActiveSubscription[]>();
+  private readonly txs$ = new Subject<Transaction[]>();
 
   // Writable Signals (State)
   readonly balance = signal<number>(this.persistenceService.read<number>('BALANCE', INITIAL_BALANCE));
@@ -28,18 +34,25 @@ export class InvestmentStore {
   readonly error = signal<string | null>(null);
 
   constructor() {
-    // Effects for Persistence
-    effect(() => {
-      this.persistenceService.write('BALANCE', this.balance());
-    });
+    // Pipelines para no asfixiar el disco
+    this.balance$.pipe(debounceTime(300), takeUntil(this.destroy$))
+      .subscribe((val: number) => this.persistenceService.write('BALANCE', val));
 
-    effect(() => {
-      this.persistenceService.write('SUBSCRIPTIONS', this.subscriptions());
-    });
+    this.subs$.pipe(debounceTime(300), takeUntil(this.destroy$))
+      .subscribe((val: ActiveSubscription[]) => this.persistenceService.write('SUBSCRIPTIONS', val));
 
-    effect(() => {
-      this.persistenceService.write('TRANSACTIONS', this.transactions());
-    });
+    this.txs$.pipe(debounceTime(300), takeUntil(this.destroy$))
+      .subscribe((val: Transaction[]) => this.persistenceService.write('TRANSACTIONS', val));
+
+    // Autodetectar cambios en el signal para enviarlos por el pipeline
+    effect(() => { this.balance$.next(this.balance()); });
+    effect(() => { this.subs$.next(this.subscriptions()); });
+    effect(() => { this.txs$.next(this.transactions()); });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Computed Signals
@@ -52,18 +65,25 @@ export class InvestmentStore {
     return this.funds().filter(fund => !subscribedSet.has(fund.id));
   });
 
+  private generateId(): string {
+    return typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2, 15);
+  }
+
   // Actions
   loadFunds(): void {
     this.loading.set(true);
     this.error.set(null);
     
     this.fundRepository.getFunds().pipe(
+      takeUntil(this.destroy$),
       catchError(err => {
         this.error.set('Error loading funds. Please try again.');
         return EMPTY;
       }),
       finalize(() => this.loading.set(false))
-    ).subscribe(data => {
+    ).subscribe((data: Fund[]) => {
       this.funds.set(data);
     });
   }
@@ -97,7 +117,7 @@ export class InvestmentStore {
     
     // Log transaction
     const newTransaction: Transaction = {
-      id: crypto.randomUUID(),
+      id: this.generateId(),
       fundId: fund.id,
       fundName: fund.name,
       type: 'subscription',
@@ -127,7 +147,7 @@ export class InvestmentStore {
     
     // Log transaction cancellation
     const newTransaction: Transaction = {
-      id: crypto.randomUUID(),
+      id: this.generateId(),
       fundId: subscription.fund.id,
       fundName: subscription.fund.name,
       type: 'cancellation',

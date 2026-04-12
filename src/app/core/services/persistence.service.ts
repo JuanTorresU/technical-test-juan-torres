@@ -36,7 +36,12 @@ export class PersistenceService {
     try {
       localStorage.setItem(lookupKey, JSON.stringify(value));
     } catch (error) {
-      console.error(`[Persistence] Falla al grabar disco en clave '${lookupKey}'.`, error);
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        this.clearAll();
+        console.error(`[Persistence] Quota excedida en localStorage. Se vació la caché para recuperar espacio.`);
+      } else {
+        console.error(`[Persistence] Falla al grabar disco en clave '${lookupKey}'.`, error);
+      }
     }
   }
 

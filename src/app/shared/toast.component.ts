@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, effect, model, input, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, model, input, OnDestroy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (isVisible()) {
+    @if (visible()) {
       <div 
         class="toast-container" 
         [class]="type()"
@@ -119,21 +119,19 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class ToastComponent {
+export class ToastComponent implements OnDestroy {
   message = input.required<string>();
   type = input<'success' | 'error' | 'info'>('info');
   visible = model<boolean>(false);
   
-  // Internal state
-  isVisible = signal<boolean>(false);
   private timeoutId: any;
 
   constructor() {
     effect(() => {
-      const isVisibleNow = this.visible();
-      this.isVisible.set(isVisibleNow);
-      
-      if (isVisibleNow) {
+      const isVisible = this.visible();
+      // Las mutaciones se disparan desde un macrotask asincrono, evitando ciclos
+      // restrictivos de Angular en "allowSignalWrites"
+      if (isVisible) {
         if (this.timeoutId) {
           clearTimeout(this.timeoutId);
         }
@@ -143,11 +141,16 @@ export class ToastComponent {
           this.closeToast();
         }, 3500);
       }
-    }, { allowSignalWrites: true });
+    }); // No allowSignalWrites: true flag required anymore
   }
 
   closeToast() {
-    this.isVisible.set(false);
     this.visible.set(false);
+  }
+
+  ngOnDestroy() {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
   }
 }

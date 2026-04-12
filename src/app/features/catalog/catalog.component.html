@@ -68,6 +68,7 @@
           <div class="form-group">
             <label for="amount">Monto a Invertir</label>
             <input 
+              #amountInput
               id="amount" 
               type="number" 
               formControlName="amount" 
@@ -109,4 +110,4 @@
   </div>
 }
 
-<app-toast [(visible)]="toastState.visible" [message]="toastState.message" [type]="toastState.type"></app-toast>
+<app-toast [(visible)]="toastVisible" [message]="toastMessage()" [type]="toastType()"></app-toast>
