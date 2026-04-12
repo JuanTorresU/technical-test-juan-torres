@@ -1,0 +1,112 @@
+<div class="catalog-container">
+  <header class="catalog-header">
+    <h2>Catálogo de Fondos</h2>
+    <p>Explora nuestras alternativas y potencia tu portafolio.</p>
+  </header>
+
+  @if (store.loading()) {
+    <div class="loader-container">
+      <div class="spinner"></div>
+    </div>
+  } @else if (store.error()) {
+    <div class="empty-state">
+      <span class="empty-icon">⚠️</span>
+      <h3>Algo salió mal</h3>
+      <p>{{ store.error() }}</p>
+    </div>
+  } @else {
+    @if (store.availableFunds().length > 0) {
+      <div class="funds-grid">
+        @for (fund of store.availableFunds(); track fund.id) {
+          <article class="fund-card">
+            <div class="fund-header">
+              <h3 class="fund-name">{{ fund.name }}</h3>
+              <span class="fund-badge">{{ fund.category }}</span>
+            </div>
+            
+            <div class="fund-info">
+              <span class="label">Monto mínimo</span>
+              <strong class="amount">{{ fund.minimumAmount | currencyCop }}</strong>
+            </div>
+
+            <div class="fund-actions">
+              <button 
+                class="btn-subscribe" 
+                (click)="openSubscribeModal(fund)"
+                [disabled]="store.balance() < fund.minimumAmount">
+                Suscribirme
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="empty-icon">🏦</span>
+        <h3>No hay fondos disponibles</h3>
+        <p>Ya estás suscrito en la totalidad de nuestras opciones operativas.</p>
+      </div>
+    }
+  }
+</div>
+
+@if (isModalOpen() && selectedFund()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Suscribirse a {{ selectedFund()?.name }}</h3>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      
+      <form [formGroup]="subscribeForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="balance-info">
+            <span>Saldo disponible:</span>
+            <strong>{{ store.balance() | currencyCop }}</strong>
+          </div>
+
+          <div class="form-group">
+            <label for="amount">Monto a Invertir</label>
+            <input 
+              id="amount" 
+              type="number" 
+              formControlName="amount" 
+              [class.is-invalid]="subscribeForm.get('amount')?.invalid && subscribeForm.get('amount')?.touched"
+              placeholder="Ingresa el monto"
+            />
+            @if (subscribeForm.get('amount')?.hasError('required') && subscribeForm.get('amount')?.touched) {
+              <small class="error-message">El monto es requerido.</small>
+            }
+            @if (subscribeForm.get('amount')?.hasError('min') && subscribeForm.get('amount')?.dirty) {
+              <small class="error-message">Debe ser mayor o igual a {{ selectedFund()?.minimumAmount | currencyCop }}.</small>
+            }
+            @if (subscribeForm.get('amount')?.hasError('max') && subscribeForm.get('amount')?.dirty) {
+              <small class="error-message">Supera tu saldo de {{ store.balance() | currencyCop }}.</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="notification">Medio de Notificación</label>
+            <select id="notification" formControlName="notification">
+              <option value="" disabled>Selecciona un medio</option>
+              <option value="email">Correo Electrónico (Email)</option>
+              <option value="sms">Mensaje de Texto (SMS)</option>
+            </select>
+            @if (subscribeForm.get('notification')?.hasError('required') && subscribeForm.get('notification')?.touched) {
+              <small class="error-message">Este campo es obligatorio.</small>
+            }
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancel" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn btn-submit" [disabled]="subscribeForm.invalid || isProcessing()">
+            Aceptar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<app-toast [(visible)]="toastState.visible" [message]="toastState.message" [type]="toastState.type"></app-toast>
