@@ -114,4 +114,131 @@ body {
   p { margin: 0; color: #94a3b8; }
 }
 
+/* === Responsive Table Pattern === */
+.responsive-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  
+  thead {
+    background: rgba(15, 23, 42, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    th {
+      padding: 16px;
+      text-align: left;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.2s, transform 0.2s;
+      
+      &:hover {
+        background: rgba(30, 41, 59, 0.5);
+      }
+      
+      td {
+        padding: 16px;
+        vertical-align: middle;
+        font-size: 0.95rem;
+        color: #e2e8f0;
+      }
+    }
+  }
+
+  /* Badge and text helpers inside tables */
+  .badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    
+    &.badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    &.badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    &.badge-gray { background: rgba(100, 116, 139, 0.2); color: #94a3b8; }
+  }
+
+  .amount-highlight {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #f8fafc;
+  }
+}
+
+/* Base tablet optimizations: Allow table but potentially break things smoothly or hide less important headers */
+@media (max-width: 1024px) {
+  .responsive-table th, .responsive-table td {
+    padding: 12px 10px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile: transform table rows into cards */
+@media (max-width: 768px) {
+  .responsive-table {
+    display: block;
+    
+    thead {
+      display: none; /* Hide standard headers on mobile */
+    }
+    
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      
+      tr {
+        display: block;
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 16px;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        
+        td {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+          text-align: right;
+          font-size: 0.95rem;
+          
+          &:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-top: 8px;
+            justify-content: flex-end; /* Buttons alignment */
+          }
+          
+          &::before {
+            content: attr(data-label);
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 500;
+            text-align: left;
+            margin-right: 16px;
+          }
+        }
+      }
+    }
+  }
+}
+
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+body {
+  overflow-x: hidden; /* Global prevent horizontal scroll requirement */
+}

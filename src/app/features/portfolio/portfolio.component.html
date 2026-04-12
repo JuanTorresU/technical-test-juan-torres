@@ -5,37 +5,48 @@
   </header>
 
   @if (store.subscriptions().length > 0) {
-    <div class="subs-grid">
-      @for (sub of store.subscriptions(); track sub.fund.id) {
-        <article class="sub-card">
-          <div class="sub-header">
-            <h3 class="sub-name">{{ sub.fund.name }}</h3>
-            <span class="sub-badge">{{ sub.fund.category }}</span>
-          </div>
-          
-          <div class="sub-details">
-            <div class="detail-row">
-              <span class="label">Monto Invertido</span>
-              <strong class="value highlight">{{ sub.amount | currencyCop }}</strong>
-            </div>
-            <div class="detail-row">
-              <span class="label">Fecha Inicio</span>
-              <span class="value">{{ sub.subscribedAt | date:'mediumDate' }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="label">Notificación Preferida</span>
-              <span class="value notification">{{ sub.notification }}</span>
-            </div>
-          </div>
-
-          <div class="sub-actions">
-            <button class="btn-cancel" (click)="openConfirm(sub)" [disabled]="isCancelling()">
-              Cancelar Inversión
-            </button>
-          </div>
-        </article>
-      }
-    </div>
+    <table class="responsive-table">
+      <thead>
+        <tr>
+          <th>Fondo Invertido</th>
+          <th>Categoría</th>
+          <th>Monto Invertido</th>
+          <th>Fecha Inicio</th>
+          <th>Notificación</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (sub of store.subscriptions(); track sub.fund.id) {
+          <tr>
+            <td data-label="Fondo Invertido">
+              <strong>{{ sub.fund.name }}</strong>
+            </td>
+            <td data-label="Categoría">
+              <span class="badge badge-green">{{ sub.fund.category }}</span>
+            </td>
+            <td data-label="Monto Invertido">
+              <span class="amount-highlight" style="color: #60a5fa;">{{ sub.amount | currencyCop }}</span>
+            </td>
+            <td data-label="Fecha Inicio">
+              {{ sub.subscribedAt | date:'mediumDate' }}
+            </td>
+            <td data-label="Notificación">
+              <span style="text-transform: uppercase; font-size: 0.85rem;">{{ sub.notification }}</span>
+            </td>
+            <td data-label="">
+              <button 
+                class="btn btn-danger" 
+                style="width: 100%; max-width: 200px;"
+                (click)="openConfirm(sub)" 
+                [disabled]="isCancelling()">
+                Cancelar Inversión
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
   } @else {
     <div class="empty-state">
       <span class="empty-icon">📂</span>

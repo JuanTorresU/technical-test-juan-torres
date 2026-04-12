@@ -5,37 +5,42 @@
   </header>
 
   @if (store.sortedTransactions().length > 0) {
-    <div class="timeline">
-      @for (tx of store.sortedTransactions(); track tx.id) {
-        <article class="transaction-card" [class.type-subscription]="tx.type === 'subscription'" [class.type-cancellation]="tx.type === 'cancellation'">
-          <div class="tx-info">
-            <div class="tx-icon">
-              <!-- Visual feedback para el tipo de transaccion -->
-              @if (tx.type === 'subscription') {
-                💸
-              } @else {
-                💰
-              }
-            </div>
-            
-            <div class="tx-details">
-              <h3 class="tx-fund">{{ tx.fundName }}</h3>
-              <span class="tx-date">{{ tx.createdAt | date:'medium' }}</span>
-              <span class="tx-badge">{{ tx.notification }}</span>
-            </div>
-          </div>
-
-          <div class="tx-amount">
-            <span class="amount-value">
-              {{ tx.type === 'subscription' ? '-' : '+' }} {{ tx.amount | currencyCop }}
-            </span>
-            <span class="status-text">
-              @if (tx.type === 'subscription') { Suscrito } @else { Devuelto }
-            </span>
-          </div>
-        </article>
-      }
-    </div>
+    <table class="responsive-table">
+      <thead>
+        <tr>
+          <th>Fondo / Servicio</th>
+          <th>Movimiento</th>
+          <th>Monto</th>
+          <th>Fecha y Hora</th>
+          <th>Notificación</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tx of store.sortedTransactions(); track tx.id) {
+          <tr>
+            <td data-label="Fondo">
+              <strong>{{ tx.fundName }}</strong>
+            </td>
+            <td data-label="Movimiento">
+              <span class="badge {{ tx.type === 'subscription' ? 'badge-blue' : 'badge-green' }}">
+                {{ tx.type === 'subscription' ? '💸 Suscrito' : '💰 Devuelto' }}
+              </span>
+            </td>
+            <td data-label="Monto">
+              <span class="amount-highlight" [style.color]="tx.type === 'subscription' ? '#e2e8f0' : '#34d399'">
+                {{ tx.type === 'subscription' ? '-' : '+' }} {{ tx.amount | currencyCop }}
+              </span>
+            </td>
+            <td data-label="Fecha y Hora">
+              {{ tx.createdAt | date:'medium' }}
+            </td>
+            <td data-label="Notificación">
+              <span class="badge badge-gray">{{ tx.notification }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
   } @else {
     <div class="empty-state">
       <span class="empty-icon">🧾</span>

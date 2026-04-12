@@ -16,30 +16,40 @@
     </div>
   } @else {
     @if (store.availableFunds().length > 0) {
-      <div class="funds-grid">
-        @for (fund of store.availableFunds(); track fund.id) {
-          <article class="fund-card">
-            <div class="fund-header">
-              <h3 class="fund-name">{{ fund.name }}</h3>
-              <span class="fund-badge">{{ fund.category }}</span>
-            </div>
-            
-            <div class="fund-info">
-              <span class="label">Monto mínimo</span>
-              <strong class="amount">{{ fund.minimumAmount | currencyCop }}</strong>
-            </div>
-
-            <div class="fund-actions">
-              <button 
-                class="btn-subscribe" 
-                (click)="openSubscribeModal(fund)"
-                [disabled]="store.balance() < fund.minimumAmount">
-                Suscribirme
-              </button>
-            </div>
-          </article>
-        }
-      </div>
+      <table class="responsive-table">
+        <thead>
+          <tr>
+            <th>Fondo de Inversión</th>
+            <th>Categoría</th>
+            <th>Monto Mínimo</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fund of store.availableFunds(); track fund.id) {
+            <tr>
+              <td data-label="Fondo">
+                <strong>{{ fund.name }}</strong>
+              </td>
+              <td data-label="Categoría">
+                <span class="badge badge-blue">{{ fund.category }}</span>
+              </td>
+              <td data-label="Monto Mínimo">
+                <span class="amount-highlight">{{ fund.minimumAmount | currencyCop }}</span>
+              </td>
+              <td data-label="">
+                <button 
+                  class="btn btn-primary" 
+                  style="width: 100%; max-width: 200px;"
+                  (click)="openSubscribeModal(fund)"
+                  [disabled]="store.balance() < fund.minimumAmount">
+                  Suscribirme
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     } @else {
       <div class="empty-state">
         <span class="empty-icon">🏦</span>
