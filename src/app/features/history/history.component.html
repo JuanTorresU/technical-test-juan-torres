@@ -1,0 +1,48 @@
+<div class="history-container">
+  <header class="history-header">
+    <h2>Historial de Movimientos</h2>
+    <p>Revisa la bitácora cronológica de todas tus inversiones y cancelaciones.</p>
+  </header>
+
+  @if (sortedTransactions().length > 0) {
+    <div class="timeline">
+      @for (tx of sortedTransactions(); track tx.id) {
+        <article class="transaction-card" [ngClass]="'type-' + tx.type">
+          <div class="tx-info">
+            <div class="tx-icon">
+              <!-- Visual feedback para el tipo de transaccion -->
+              @if (tx.type === 'subscription') {
+                💸
+              } @else {
+                💰
+              }
+            </div>
+            
+            <div class="tx-details">
+              <h3 class="tx-fund">{{ tx.fundName }}</h3>
+              <span class="tx-date">{{ tx.createdAt | date:'medium' }}</span>
+              <span class="tx-badge">{{ tx.notification }}</span>
+            </div>
+          </div>
+
+          <div class="tx-amount">
+            <span class="amount-value">
+               <!-- Simbología financiera nativa -->
+               @if (tx.type === 'subscription') { - } @else { + }
+               {{ tx.amount | currencyCop }}
+            </span>
+            <span class="status-text">
+              @if (tx.type === 'subscription') { Suscrito } @else { Devuelto }
+            </span>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon">🧾</span>
+      <h3>No hay movimientos</h3>
+      <p>Aún no has participado en fondos ni has generado giros dentro de la plataforma.</p>
+    </div>
+  }
+</div>

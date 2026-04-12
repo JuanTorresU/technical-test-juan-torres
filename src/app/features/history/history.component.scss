@@ -1,0 +1,164 @@
+.history-container {
+  padding: 24px;
+  max-width: 900px; /* Mas comprimido visualmente para sentirse como un feed */
+  margin: 0 auto;
+  color: #f8fafc;
+  animation: fadeIn 0.3s ease-out;
+
+  .history-header {
+    margin-bottom: 32px;
+    
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      color: #94a3b8;
+      margin-top: 8px;
+    }
+  }
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.transaction-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px 20px;
+  transition: transform 0.2s, background 0.2s;
+
+  &:hover {
+    background: rgba(30, 41, 59, 0.8);
+    transform: translateX(4px);
+  }
+
+  .tx-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .tx-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .tx-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .tx-fund {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #e2e8f0;
+        margin: 0;
+      }
+      .tx-date {
+        font-size: 0.8rem;
+        color: #64748b;
+      }
+      .tx-badge {
+        display: inline-block;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
+        text-transform: uppercase;
+        width: max-content;
+      }
+    }
+  }
+
+  .tx-amount {
+    text-align: right;
+
+    .amount-value {
+      display: block;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .status-text {
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  }
+
+  /* Success: Cancellation (Monto devuelto) */
+  &.type-cancellation {
+    .tx-icon {
+      background: rgba(16, 185, 129, 0.1);
+      color: #34d399;
+    }
+    .amount-value {
+      color: #34d399;
+    }
+    .status-text {
+      color: #10b981;
+    }
+  }
+
+  /* Primary: Subscription (Monto Gastado) */
+  &.type-subscription {
+    .tx-icon {
+      background: rgba(59, 130, 246, 0.1);
+      color: #60a5fa;
+    }
+    .amount-value {
+      color: #e2e8f0;
+    }
+    .status-text {
+      color: #3b82f6;
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  h3 { margin: 0 0 8px 0; color: #f8fafc; }
+  p { margin: 0; color: #94a3b8; }
+}
+
+/* Responsividad extra */
+@media (max-width: 500px) {
+  .transaction-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    .tx-amount {
+      text-align: left;
+      padding-left: 64px; /* Alinear con los textos de detalle ignorando icono */
+    }
+  }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

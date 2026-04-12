@@ -9,5 +9,9 @@ export const routes: Routes = [
   {
     path: 'portfolio',
     loadChildren: () => import('./features/portfolio/portfolio.routes').then(m => m.PORTFOLIO_ROUTES)
+  },
+  {
+    path: 'history',
+    loadChildren: () => import('./features/history/history.routes').then(m => m.HISTORY_ROUTES)
   }
 ];
