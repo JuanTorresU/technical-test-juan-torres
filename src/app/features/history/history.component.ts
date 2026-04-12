@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InvestmentStore } from '../../state/investment.store';
 import { CurrencyCopPipe } from '../../shared/currency-cop.pipe';
@@ -6,6 +6,7 @@ import { CurrencyCopPipe } from '../../shared/currency-cop.pipe';
 @Component({
   selector: 'app-history',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, CurrencyCopPipe],
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss']

@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject, OnDestroy, effect } from '@angular/core';
-import { finalize, catchError, EMPTY, debounceTime, Subject, takeUntil } from 'rxjs';
+import { finalize, catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 import { FundRepository } from '../core/repositories/fund.repository';
 import { PersistenceService } from '../core/services/persistence.service';
 import { 
@@ -18,11 +18,8 @@ export class InvestmentStore implements OnDestroy {
   private readonly fundRepository = inject(FundRepository);
   private readonly persistenceService = inject(PersistenceService);
 
-  // RxJS Subjects para control de Memory Leaks y Debounce de localStorage
+  // RxJS Subjects
   private readonly destroy$ = new Subject<void>();
-  private readonly balance$ = new Subject<number>();
-  private readonly subs$ = new Subject<ActiveSubscription[]>();
-  private readonly txs$ = new Subject<Transaction[]>();
 
   // Writable Signals (State)
   readonly balance = signal<number>(this.persistenceService.read<number>('BALANCE', INITIAL_BALANCE));
@@ -34,20 +31,23 @@ export class InvestmentStore implements OnDestroy {
   readonly error = signal<string | null>(null);
 
   constructor() {
-    // Pipelines para no asfixiar el disco
-    this.balance$.pipe(debounceTime(300), takeUntil(this.destroy$))
-      .subscribe((val: number) => this.persistenceService.write('BALANCE', val));
+    effect((onCleanup) => {
+      const b = this.balance();
+      const id = setTimeout(() => this.persistenceService.write('BALANCE', b), 300);
+      onCleanup(() => clearTimeout(id));
+    });
 
-    this.subs$.pipe(debounceTime(300), takeUntil(this.destroy$))
-      .subscribe((val: ActiveSubscription[]) => this.persistenceService.write('SUBSCRIPTIONS', val));
+    effect((onCleanup) => {
+      const s = this.subscriptions();
+      const id = setTimeout(() => this.persistenceService.write('SUBSCRIPTIONS', s), 300);
+      onCleanup(() => clearTimeout(id));
+    });
 
-    this.txs$.pipe(debounceTime(300), takeUntil(this.destroy$))
-      .subscribe((val: Transaction[]) => this.persistenceService.write('TRANSACTIONS', val));
-
-    // Autodetectar cambios en el signal para enviarlos por el pipeline
-    effect(() => { this.balance$.next(this.balance()); });
-    effect(() => { this.subs$.next(this.subscriptions()); });
-    effect(() => { this.txs$.next(this.transactions()); });
+    effect((onCleanup) => {
+      const t = this.transactions();
+      const id = setTimeout(() => this.persistenceService.write('TRANSACTIONS', t), 300);
+      onCleanup(() => clearTimeout(id));
+    });
   }
 
   ngOnDestroy() {

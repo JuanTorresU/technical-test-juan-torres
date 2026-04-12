@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, HostListener, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { InvestmentStore } from '../../state/investment.store';
@@ -16,13 +16,15 @@ const ERROR_MESSAGES: Record<string, string> = {
 @Component({
   selector: 'app-catalog',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, CurrencyCopPipe, ToastComponent],
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss']
 })
-export class CatalogComponent implements OnInit {
+export class CatalogComponent implements OnInit, OnDestroy {
   readonly store = inject(InvestmentStore);
   private fb = inject(FormBuilder);
+  private timeoutId?: ReturnType<typeof setTimeout>;
 
   @ViewChild('amountInput') amountInput!: ElementRef<HTMLInputElement>;
 
@@ -51,6 +53,12 @@ export class CatalogComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
+  }
+
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.isModalOpen()) {
@@ -75,7 +83,7 @@ export class CatalogComponent implements OnInit {
     this.isModalOpen.set(true);
 
     // Focus input after render
-    setTimeout(() => {
+    this.timeoutId = setTimeout(() => {
       if (this.amountInput?.nativeElement) {
         this.amountInput.nativeElement.focus();
       }
@@ -105,7 +113,7 @@ export class CatalogComponent implements OnInit {
 
     this.isProcessing.set(true);
 
-    const amount = this.subscribeForm.get('amount')?.value;
+    const amount = Number(this.subscribeForm.get('amount')?.value);
     const notification = this.subscribeForm.get('notification')?.value;
 
     const result = this.store.subscribeTo(fund, amount, notification);

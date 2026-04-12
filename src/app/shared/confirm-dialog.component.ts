@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, model } from '@angular/core';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -133,7 +133,7 @@ import { Component, ChangeDetectionStrategy, input, output } from '@angular/core
 export class ConfirmDialogComponent {
   title = input.required<string>();
   message = input.required<string>();
-  visible = input<boolean>(false);
+  visible = model<boolean>(false);
   
   confirmed = output<void>();
   cancelled = output<void>();

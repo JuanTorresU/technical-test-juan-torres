@@ -96,3 +96,22 @@ body {
   margin: 0 auto;
   padding: 0 1rem;
 }
+
+/* Global Shared Components */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  h3 { margin: 0 0 8px 0; color: #f8fafc; }
+  p { margin: 0; color: #94a3b8; }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

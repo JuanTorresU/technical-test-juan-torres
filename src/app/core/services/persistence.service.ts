@@ -21,8 +21,7 @@ export class PersistenceService {
         return defaultValue;
       }
       return JSON.parse(storedItem) as T;
-    } catch (error) {
-      console.warn(`[Persistence] Error rehidratando '${lookupKey}'. Reseteando a Default.`, error);
+    } catch {
       this.clearItem(key);
       return defaultValue;
     }
@@ -38,9 +37,6 @@ export class PersistenceService {
     } catch (error) {
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
         this.clearAll();
-        console.error(`[Persistence] Quota excedida en localStorage. Se vació la caché para recuperar espacio.`);
-      } else {
-        console.error(`[Persistence] Falla al grabar disco en clave '${lookupKey}'.`, error);
       }
     }
   }

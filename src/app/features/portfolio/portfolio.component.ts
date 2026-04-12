@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InvestmentStore } from '../../state/investment.store';
 import { ActiveSubscription } from '../../core/models/fund.model';
@@ -9,12 +9,14 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 @Component({
   selector: 'app-portfolio',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, CurrencyCopPipe, ToastComponent, ConfirmDialogComponent],
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.scss']
 })
 export class PortfolioComponent {
   readonly store = inject(InvestmentStore);
+  private currencyPipe = inject(CurrencyCopPipe);
 
   // Status del ConfirmDialog
   showConfirmDialog = signal(false);
@@ -30,7 +32,7 @@ export class PortfolioComponent {
   readonly confirmMessage = computed(() => {
     const sub = this.fundToCancel();
     if (!sub) return '';
-    const amount = new CurrencyCopPipe().transform(sub.amount);
+    const amount = this.currencyPipe.transform(sub.amount);
     return `¿Estás seguro que deseas cancelar tu fondo ${sub.fund.name}? El monto de ${amount} será reintegrado a tu saldo disponible inmediatamente.`;
   });
 
