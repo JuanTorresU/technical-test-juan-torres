@@ -4,10 +4,10 @@
     <p>Revisa la bitácora cronológica de todas tus inversiones y cancelaciones.</p>
   </header>
 
-  @if (sortedTransactions().length > 0) {
+  @if (store.sortedTransactions().length > 0) {
     <div class="timeline">
-      @for (tx of sortedTransactions(); track tx.id) {
-        <article class="transaction-card" [ngClass]="'type-' + tx.type">
+      @for (tx of store.sortedTransactions(); track tx.id) {
+        <article class="transaction-card" [class.type-subscription]="tx.type === 'subscription'" [class.type-cancellation]="tx.type === 'cancellation'">
           <div class="tx-info">
             <div class="tx-icon">
               <!-- Visual feedback para el tipo de transaccion -->
@@ -27,9 +27,7 @@
 
           <div class="tx-amount">
             <span class="amount-value">
-               <!-- Simbología financiera nativa -->
-               @if (tx.type === 'subscription') { - } @else { + }
-               {{ tx.amount | currencyCop }}
+              {{ tx.type === 'subscription' ? '-' : '+' }} {{ tx.amount | currencyCop }}
             </span>
             <span class="status-text">
               @if (tx.type === 'subscription') { Suscrito } @else { Devuelto }

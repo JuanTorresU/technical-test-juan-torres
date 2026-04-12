@@ -8,7 +8,7 @@ import { CurrencyCopPipe } from './shared/currency-cop.pipe';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CurrencyCopPipe],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   readonly store = inject(InvestmentStore);

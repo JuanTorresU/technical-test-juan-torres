@@ -65,6 +65,12 @@ export class InvestmentStore implements OnDestroy {
     return this.funds().filter(fund => !subscribedSet.has(fund.id));
   });
 
+  readonly sortedTransactions = computed(() =>
+    [...this.transactions()].sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+  );
+
   private generateId(): string {
     return typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
