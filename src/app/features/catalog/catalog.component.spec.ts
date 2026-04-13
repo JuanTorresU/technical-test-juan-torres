@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogComponent } from './catalog.component';
 import { InvestmentStore } from '../../state/investment.store';
 import { signal } from '@angular/core';
@@ -15,7 +15,13 @@ describe('CatalogComponent', () => {
         { id: 1, name: 'Fund A', minimumAmount: 50000, category: 'FPV' },
         { id: 2, name: 'Fund B', minimumAmount: 75000, category: 'FIC' }
       ]),
+      availableFunds: signal([
+        { id: 1, name: 'Fund A', minimumAmount: 50000, category: 'FPV' },
+        { id: 2, name: 'Fund B', minimumAmount: 75000, category: 'FIC' }
+      ]),
       balance: signal(500000),
+      loading: signal(false),
+      error: signal(null),
       loadFunds: jasmine.createSpy('loadFunds'),
       subscribeTo: jasmine.createSpy('subscribeTo').and.returnValue({ success: true })
     };
@@ -65,7 +71,7 @@ describe('CatalogComponent', () => {
     expect(component.isProcessing()).toBeFalse();
   });
 
-  it('should call store.subscribeTo and close modal on successful form submission', fakeAsync(() => {
+  it('should call store.subscribeTo and close modal on successful form submission', async () => {
     const fund = storeMock.funds()[0];
     component.openSubscribeModal(fund);
     
@@ -76,16 +82,15 @@ describe('CatalogComponent', () => {
     
     expect(component.subscribeForm.valid).toBeTrue();
     
-    component.onSubmit();
+    const submitPromise = component.onSubmit();
     
     expect(component.isProcessing()).toBeTrue();
     
-    // Advance internal simulated delay
-    tick(600);
+    await submitPromise;
     
     expect(storeMock.subscribeTo).toHaveBeenCalledWith(fund, 100000, 'email');
     expect(component.isModalOpen()).toBeFalse();
     expect(component.toastVisible()).toBeTrue();
     expect(component.toastType()).toBe('success');
-  }));
+  });
 });

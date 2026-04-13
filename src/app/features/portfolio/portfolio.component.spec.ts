@@ -52,8 +52,8 @@ describe('PortfolioComponent', () => {
   });
 
   it('should open confirmation dialog and subsequently cancel fund via store', () => {
-    const activeSub = {
-      fund: { id: 1, name: 'Fund A' },
+    const activeSub: any = {
+      fund: { id: 1, name: 'Fund A', minimumAmount: 50000, category: 'FPV' },
       amount: 50000,
       notification: 'sms',
       subscribedAt: new Date().toISOString()

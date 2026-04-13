@@ -30,7 +30,10 @@ export class InvestmentStore {
     defaultValue: [] as Fund[]
   });
 
-  readonly funds = computed(() => this.fundsResource.value());
+  readonly funds = computed(() => {
+    if (this.fundsResource.error()) return [];
+    return this.fundsResource.value() || [];
+  });
   readonly loading = computed(() => this.fundsResource.isLoading());
   readonly error = computed(() => {
     const err = this.fundsResource.error();

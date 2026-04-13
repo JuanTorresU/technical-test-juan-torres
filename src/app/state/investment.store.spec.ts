@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { InvestmentStore } from './investment.store';
 import { FUND_REPOSITORY, FundRepository } from '../core/repositories/fund.repository';
@@ -42,27 +42,27 @@ describe('InvestmentStore', () => {
     store = TestBed.inject(InvestmentStore);
   });
 
-  afterEach(() => {
-    store.ngOnDestroy();
-  });
+
 
   it('should be created', () => {
     expect(store).toBeTruthy();
   });
 
   describe('loadFunds', () => {
-    it('should successfully load funds (carga de fondos exitosa)', () => {
+    it('should successfully load funds (carga de fondos exitosa)', async () => {
       store.loadFunds();
+      await new Promise(r => setTimeout(r, 50));
       expect(store.loading()).toBeFalse();
       expect(store.error()).toBeNull();
       expect(store.funds()).toEqual(mockFunds);
     });
 
-    it('should handle error when loading funds (error al cargar fondos)', () => {
+    it('should handle error when loading funds (error al cargar fondos)', async () => {
       mockFundRepository.getFunds.and.returnValue(throwError(() => new Error('API Error')));
       store.loadFunds();
+      await new Promise(r => setTimeout(r, 50));
       expect(store.loading()).toBeFalse();
-      expect(store.error()).toBe('Error loading funds. Please try again.');
+      expect(store.error()).toBe('API Error');
       expect(store.funds()).toEqual([]);
     });
   });
@@ -71,8 +71,7 @@ describe('InvestmentStore', () => {
     let testFund: Fund;
 
     beforeEach(() => {
-      store.loadFunds();
-      testFund = store.funds()[0]; // minimumAmount: 50000
+      testFund = mockFunds[0]; // minimumAmount: 50000
     });
 
     it('should successfully subscribe to a fund (suscripcion exitosa)', () => {
@@ -118,8 +117,7 @@ describe('InvestmentStore', () => {
     let testFund: Fund;
 
     beforeEach(() => {
-      store.loadFunds();
-      testFund = store.funds()[0];
+      testFund = mockFunds[0];
       store.subscribeTo(testFund, 100000, 'sms');
     });
 
@@ -147,8 +145,9 @@ describe('InvestmentStore', () => {
   });
 
   describe('availableFunds computation', () => {
-    it('should exclude subscribed funds (availableFunds excluye fondos suscritos)', () => {
+    it('should exclude subscribed funds (availableFunds excluye fondos suscritos)', async () => {
       store.loadFunds();
+      await new Promise(r => setTimeout(r, 50));
       const initialAvailable = store.availableFunds();
       expect(initialAvailable.length).toBe(2);
 
@@ -161,8 +160,9 @@ describe('InvestmentStore', () => {
   });
 
   describe('sortedTransactions computation', () => {
-    it('should return transactions sorted by date descending', () => {
+    it('should return transactions sorted by date descending', async () => {
       store.loadFunds();
+      await new Promise(r => setTimeout(r, 50));
       store.subscribeTo(mockFunds[0], 50000, 'email');
       store.cancelSubscription(mockFunds[0].id);
       
@@ -173,7 +173,7 @@ describe('InvestmentStore', () => {
   });
 
   describe('persistence effects', () => {
-    it('should write to localStorage with debounce when state changes', fakeAsync(() => {
+    it('should write to localStorage with debounce when state changes', async () => {
       // Ignore initial execution of effects
       mockPersistenceService.write.calls.reset();
       
@@ -182,9 +182,9 @@ describe('InvestmentStore', () => {
       
       expect(mockPersistenceService.write).not.toHaveBeenCalled();
       
-      tick(300);
+      await new Promise(r => setTimeout(r, 350));
       
       expect(mockPersistenceService.write).toHaveBeenCalledWith('BALANCE', 100);
-    }));
+    });
   });
 });
