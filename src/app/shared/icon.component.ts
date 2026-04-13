@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, computed, inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
-/** Nombres de íconos SVG disponibles en la aplicación */
 export type IconName =
   | 'chart-line'
   | 'alert-triangle'
@@ -19,7 +18,7 @@ export type IconName =
   | 'smartphone'
   | 'loader';
 
-/** Mapa de paths SVG por nombre de ícono (basados en Lucide Icons) */
+// Paths SVG de Lucide Icons
 const ICONS: Record<IconName, string> = {
   'chart-line': '<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>',
   'alert-triangle': '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/>',
@@ -53,7 +52,6 @@ const ICONS: Record<IconName, string> = {
     span { display: contents; }
   `]
 })
-/** Componente que renderiza íconos SVG inline con tamaño configurable */
 export class IconComponent {
   private sanitizer = inject(DomSanitizer);
 

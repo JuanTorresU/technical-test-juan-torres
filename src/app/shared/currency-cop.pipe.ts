@@ -3,7 +3,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'currencyCop'
 })
-/** Pipe que formatea valores numéricos como moneda colombiana (COP $X.XXX) */
 export class CurrencyCopPipe implements PipeTransform {
   // Formatter cacheado para evitar reinstanciación en cada transform
   private static formatter = new Intl.NumberFormat('es-CO', {

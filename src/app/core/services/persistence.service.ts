@@ -1,24 +1,17 @@
 import { Injectable } from '@angular/core';
 
-/**
- * Servicio de persistencia en localStorage.
- * Gestiona lectura/escritura tipada con validación de esquema
- * y manejo de errores de cuota.
- */
 @Injectable({
   providedIn: 'root'
 })
 export class PersistenceService {
-  /** Llaves usadas en localStorage para cada tipo de dato */
+  // Llaves de localStorage
   private readonly KEYS = {
     BALANCE: 'fm_balance',
     SUBSCRIPTIONS: 'fm_subscriptions',
     TRANSACTIONS: 'fm_transactions'
   };
 
-  /**
-   * Lee datos del localStorage para la llave dada o retorna la semilla 'defaultValue' en caso de no existir o corromperse.
-   */
+  // Retorna defaultValue si no existe o si el dato está corrupto
   read<T>(key: 'BALANCE' | 'SUBSCRIPTIONS' | 'TRANSACTIONS', defaultValue: T): T {
     const lookupKey = this.KEYS[key];
     try {
@@ -37,9 +30,6 @@ export class PersistenceService {
     }
   }
 
-  /**
-   * Persiste directamente los datos convirtiendo el objecto a string, si falla no corrompe la UI.
-   */
   write<T>(key: 'BALANCE' | 'SUBSCRIPTIONS' | 'TRANSACTIONS', value: T): void {
     const lookupKey = this.KEYS[key];
     try {
@@ -56,16 +46,10 @@ export class PersistenceService {
     }
   }
 
-  /**
-   * Utilidad para limpiar local individualmente.
-   */
   clearItem(key: 'BALANCE' | 'SUBSCRIPTIONS' | 'TRANSACTIONS'): void {
     localStorage.removeItem(this.KEYS[key]);
   }
 
-  /**
-   * Resetea la infraestructura de cache de fondos completa.
-   */
   clearAll(): void {
     Object.values(this.KEYS).forEach(k => localStorage.removeItem(k));
   }

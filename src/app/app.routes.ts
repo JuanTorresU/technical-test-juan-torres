@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 
-/** Rutas principales con carga diferida (lazy loading) por feature */
 export const routes: Routes = [
   { path: '', redirectTo: 'catalog', pathMatch: 'full' },
   { 
