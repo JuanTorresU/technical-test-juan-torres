@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject, OnDestroy, effect } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { finalize, catchError, EMPTY, Subject, takeUntil } from 'rxjs';
-import { FundRepository } from '../core/repositories/fund.repository';
+import { FUND_REPOSITORY } from '../core/repositories/fund.repository';
 import { PersistenceService } from '../core/services/persistence.service';
 import { 
   Fund, 
@@ -15,7 +16,7 @@ import { INITIAL_BALANCE } from '../core/data/funds.mock';
   providedIn: 'root'
 })
 export class InvestmentStore implements OnDestroy {
-  private readonly fundRepository = inject(FundRepository);
+  private readonly fundRepository = inject(FUND_REPOSITORY);
   private readonly persistenceService = inject(PersistenceService);
 
   // RxJS Subjects
@@ -25,10 +26,17 @@ export class InvestmentStore implements OnDestroy {
   readonly balance = signal<number>(this.persistenceService.read<number>('BALANCE', INITIAL_BALANCE));
   readonly subscriptions = signal<ActiveSubscription[]>(this.persistenceService.read<ActiveSubscription[]>('SUBSCRIPTIONS', []));
   readonly transactions = signal<Transaction[]>(this.persistenceService.read<Transaction[]>('TRANSACTIONS', []));
-  readonly funds = signal<Fund[]>([]);
-  
-  readonly loading = signal<boolean>(false);
-  readonly error = signal<string | null>(null);
+  // rxResource automatically handles fetching
+  private readonly fundsResource = rxResource({
+    loader: () => this.fundRepository.getFunds()
+  });
+
+  readonly funds = computed(() => this.fundsResource.value() ?? []);
+  readonly loading = computed(() => this.fundsResource.isLoading());
+  readonly error = computed(() => {
+    const err = this.fundsResource.error();
+    return err ? (err instanceof Error ? err.message : 'Error loading funds. Please try again.') : null;
+  });
 
   constructor() {
     effect((onCleanup) => {
@@ -74,19 +82,7 @@ export class InvestmentStore implements OnDestroy {
 
   // Actions
   loadFunds(): void {
-    this.loading.set(true);
-    this.error.set(null);
-    
-    this.fundRepository.getFunds().pipe(
-      takeUntil(this.destroy$),
-      catchError(err => {
-        this.error.set(err instanceof Error ? err.message : 'Error loading funds. Please try again.');
-        return EMPTY;
-      }),
-      finalize(() => this.loading.set(false))
-    ).subscribe((data: Fund[]) => {
-      this.funds.set(data);
-    });
+    this.fundsResource.reload();
   }
 
   subscribeTo(fund: Fund, amount: number, notification: NotificationMethod): OperationResult {

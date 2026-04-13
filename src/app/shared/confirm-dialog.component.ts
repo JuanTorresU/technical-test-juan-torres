@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, input, output, model } from '@angul
 
 @Component({
   selector: 'app-confirm-dialog',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (visible()) {

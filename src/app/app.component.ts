@@ -5,7 +5,6 @@ import { CurrencyCopPipe } from './shared/currency-cop.pipe';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CurrencyCopPipe],
   templateUrl: './app.component.html',

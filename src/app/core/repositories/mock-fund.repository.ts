@@ -7,8 +7,8 @@ import { Fund } from '../models/fund.model';
 @Injectable({
   providedIn: 'root'
 })
-export class MockFundRepository extends FundRepository {
-  override getFunds(): Observable<Fund[]> {
+export class MockFundRepository implements FundRepository {
+  getFunds(): Observable<Fund[]> {
     return of(FUNDS_MOCK).pipe(delay(600));
   }
 }

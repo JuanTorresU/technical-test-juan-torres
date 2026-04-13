@@ -4,14 +4,14 @@ export const routes: Routes = [
   { path: '', redirectTo: 'catalog', pathMatch: 'full' },
   { 
     path: 'catalog', 
-    loadChildren: () => import('./features/catalog/catalog.routes').then(m => m.CATALOG_ROUTES)
+    loadComponent: () => import('./features/catalog/catalog.component').then(m => m.CatalogComponent)
   },
   {
     path: 'portfolio',
-    loadChildren: () => import('./features/portfolio/portfolio.routes').then(m => m.PORTFOLIO_ROUTES)
+    loadComponent: () => import('./features/portfolio/portfolio.component').then(m => m.PortfolioComponent)
   },
   {
     path: 'history',
-    loadChildren: () => import('./features/history/history.routes').then(m => m.HISTORY_ROUTES)
+    loadComponent: () => import('./features/history/history.component').then(m => m.HistoryComponent)
   }
 ];

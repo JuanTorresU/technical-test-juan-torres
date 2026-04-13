@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { InvestmentStore } from '../../state/investment.store';
 import { ActiveSubscription } from '../../core/models/fund.model';
 import { CurrencyCopPipe } from '../../shared/currency-cop.pipe';
@@ -8,9 +8,8 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 
 @Component({
   selector: 'app-portfolio',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, CurrencyCopPipe, ToastComponent, ConfirmDialogComponent],
+  imports: [DatePipe, CurrencyCopPipe, ToastComponent, ConfirmDialogComponent],
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.scss']
 })

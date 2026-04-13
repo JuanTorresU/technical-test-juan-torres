@@ -1,7 +1,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { InvestmentStore } from './investment.store';
-import { FundRepository } from '../core/repositories/fund.repository';
+import { FUND_REPOSITORY, FundRepository } from '../core/repositories/fund.repository';
 import { PersistenceService } from '../core/services/persistence.service';
 import { Fund } from '../core/models/fund.model';
 import { INITIAL_BALANCE } from '../core/data/funds.mock';
@@ -34,7 +34,7 @@ describe('InvestmentStore', () => {
     TestBed.configureTestingModule({
       providers: [
         InvestmentStore,
-        { provide: FundRepository, useValue: mockFundRepository },
+        { provide: FUND_REPOSITORY, useValue: mockFundRepository },
         { provide: PersistenceService, useValue: mockPersistenceService }
       ]
     });

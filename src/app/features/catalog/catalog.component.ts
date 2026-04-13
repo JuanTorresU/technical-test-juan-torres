@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, HostListener, ViewChild, ElementRef, ChangeDetectionStrategy, afterNextRender, Injector } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { InvestmentStore } from '../../state/investment.store';
 import { Fund } from '../../core/models/fund.model';
@@ -15,9 +15,8 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 @Component({
   selector: 'app-catalog',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, CurrencyCopPipe, ToastComponent],
+  imports: [ReactiveFormsModule, CurrencyCopPipe, ToastComponent],
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss']
 })

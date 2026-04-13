@@ -1,10 +1,8 @@
 import { Component, ChangeDetectionStrategy, model, input, OnDestroy, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-toast',
-  standalone: true,
-  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (visible()) {
