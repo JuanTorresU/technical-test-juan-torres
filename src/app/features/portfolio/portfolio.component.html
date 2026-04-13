@@ -59,7 +59,7 @@
 <app-confirm-dialog
   [visible]="showConfirmDialog()"
   [title]="'Confirmar Cancelación'"
-  [message]="confirmMessage()"
+  [message]="'¿Estás seguro que deseas cancelar tu fondo ' + (fundToCancel()?.fund?.name || '') + '? El monto de ' + ((fundToCancel()?.amount || 0) | currencyCop) + ' será reintegrado a tu saldo disponible inmediatamente.'"
   (confirmed)="executeCancellation()"
   (cancelled)="cancelDialog()">
 </app-confirm-dialog>

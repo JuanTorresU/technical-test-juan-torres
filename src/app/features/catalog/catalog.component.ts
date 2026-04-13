@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal, HostListener, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, HostListener, ViewChild, ElementRef, ChangeDetectionStrategy, afterNextRender, Injector } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { InvestmentStore } from '../../state/investment.store';
@@ -21,10 +21,10 @@ const ERROR_MESSAGES: Record<string, string> = {
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss']
 })
-export class CatalogComponent implements OnInit, OnDestroy {
+export class CatalogComponent implements OnInit {
   readonly store = inject(InvestmentStore);
   private fb = inject(FormBuilder);
-  private timeoutId?: ReturnType<typeof setTimeout>;
+  private injector = inject(Injector);
 
   @ViewChild('amountInput') amountInput!: ElementRef<HTMLInputElement>;
 
@@ -53,15 +53,11 @@ export class CatalogComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.timeoutId) {
-      clearTimeout(this.timeoutId);
-    }
-  }
+
 
   @HostListener('document:keydown.escape')
   onEscape() {
-    if (this.isModalOpen()) {
+    if (this.isModalOpen() && !this.toastVisible()) {
       this.closeModal();
     }
   }
@@ -83,11 +79,11 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.isModalOpen.set(true);
 
     // Focus input after render
-    this.timeoutId = setTimeout(() => {
+    afterNextRender(() => {
       if (this.amountInput?.nativeElement) {
         this.amountInput.nativeElement.focus();
       }
-    }, 50);
+    }, { injector: this.injector });
   }
 
   closeModal() {

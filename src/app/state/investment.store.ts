@@ -33,19 +33,14 @@ export class InvestmentStore implements OnDestroy {
   constructor() {
     effect((onCleanup) => {
       const b = this.balance();
-      const id = setTimeout(() => this.persistenceService.write('BALANCE', b), 300);
-      onCleanup(() => clearTimeout(id));
-    });
-
-    effect((onCleanup) => {
       const s = this.subscriptions();
-      const id = setTimeout(() => this.persistenceService.write('SUBSCRIPTIONS', s), 300);
-      onCleanup(() => clearTimeout(id));
-    });
-
-    effect((onCleanup) => {
       const t = this.transactions();
-      const id = setTimeout(() => this.persistenceService.write('TRANSACTIONS', t), 300);
+      
+      const id = setTimeout(() => {
+        this.persistenceService.write('BALANCE', b);
+        this.persistenceService.write('SUBSCRIPTIONS', s);
+        this.persistenceService.write('TRANSACTIONS', t);
+      }, 300);
       onCleanup(() => clearTimeout(id));
     });
   }
@@ -74,7 +69,7 @@ export class InvestmentStore implements OnDestroy {
   private generateId(): string {
     return typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
-      : Math.random().toString(36).substring(2, 15);
+      : `tx-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   }
 
   // Actions
@@ -85,7 +80,7 @@ export class InvestmentStore implements OnDestroy {
     this.fundRepository.getFunds().pipe(
       takeUntil(this.destroy$),
       catchError(err => {
-        this.error.set('Error loading funds. Please try again.');
+        this.error.set(err instanceof Error ? err.message : 'Error loading funds. Please try again.');
         return EMPTY;
       }),
       finalize(() => this.loading.set(false))
@@ -95,6 +90,10 @@ export class InvestmentStore implements OnDestroy {
   }
 
   subscribeTo(fund: Fund, amount: number, notification: NotificationMethod): OperationResult {
+    if (!Number.isFinite(amount) || isNaN(amount) || amount <= 0) {
+      return { success: false, error: 'BELOW_MINIMUM' };
+    }
+
     if (amount < fund.minimumAmount) {
       return { success: false, error: 'BELOW_MINIMUM' };
     }

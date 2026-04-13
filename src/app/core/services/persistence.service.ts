@@ -20,7 +20,11 @@ export class PersistenceService {
       if (storedItem === null) {
         return defaultValue;
       }
-      return JSON.parse(storedItem) as T;
+      const parsed = JSON.parse(storedItem);
+      if (key === 'BALANCE' && typeof parsed !== 'number') throw new Error('Invalid schema');
+      if ((key === 'SUBSCRIPTIONS' || key === 'TRANSACTIONS') && !Array.isArray(parsed)) throw new Error('Invalid schema');
+
+      return parsed as T;
     } catch {
       this.clearItem(key);
       return defaultValue;
@@ -36,7 +40,12 @@ export class PersistenceService {
       localStorage.setItem(lookupKey, JSON.stringify(value));
     } catch (error) {
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-        this.clearAll();
+        this.clearItem(key);
+        try {
+          localStorage.setItem(lookupKey, JSON.stringify(value));
+        } catch {
+          this.clearAll();
+        }
       }
     }
   }
