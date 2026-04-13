@@ -2,38 +2,32 @@
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
-  color: #f8fafc;
+  color: var(--text-primary);
   animation: fadeIn 0.4s ease-out;
-
-  .portfolio-header {
-    margin-bottom: 32px;
-    
-    h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0;
-      background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    p {
-      color: #94a3b8;
-      margin-top: 8px;
-    }
-  }
 }
 
-.btn-danger {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  
+.btn-danger-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--danger);
+  background: transparent;
+  color: var(--danger);
+  transition: all 0.2s ease;
+
   &:hover:not(:disabled) {
-    background: #ef4444;
-    color: white;
-    border-color: #ef4444;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    background: var(--danger);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
   }
 }
-
-

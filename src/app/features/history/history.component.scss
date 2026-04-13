@@ -1,26 +1,7 @@
 .history-container {
   padding: 24px;
-  max-width: 900px; /* Mas comprimido visualmente para sentirse como un feed */
+  max-width: 1200px;
   margin: 0 auto;
-  color: #f8fafc;
+  color: var(--text-primary);
   animation: fadeIn 0.3s ease-out;
-
-  .history-header {
-    margin-bottom: 32px;
-    
-    h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0;
-      background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    p {
-      color: #94a3b8;
-      margin-top: 8px;
-    }
-  }
 }
-
-

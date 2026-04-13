@@ -1,9 +1,11 @@
 import { Component, ChangeDetectionStrategy, model, input, OnDestroy, effect } from '@angular/core';
+import { IconComponent } from './icon.component';
 
 
 @Component({
   selector: 'app-toast',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IconComponent],
   template: `
     @if (visible()) {
       <div 
@@ -11,10 +13,17 @@ import { Component, ChangeDetectionStrategy, model, input, OnDestroy, effect } f
         [class]="type()"
       >
         <div class="toast-indicator"></div>
+        <span class="toast-type-icon">
+          @switch (type()) {
+            @case ('success') { <app-icon name="check-circle" [size]="20" /> }
+            @case ('error') { <app-icon name="x-circle" [size]="20" /> }
+            @default { <app-icon name="info" [size]="20" /> }
+          }
+        </span>
         <div class="toast-content">
           <p class="toast-message">{{ message() }}</p>
         </div>
-        <button class="toast-close" (click)="closeToast()">×</button>
+        <button class="toast-close" (click)="closeToast()"><app-icon name="x" [size]="16" /></button>
       </div>
     }
   `,
@@ -30,62 +39,39 @@ import { Component, ChangeDetectionStrategy, model, input, OnDestroy, effect } f
       align-items: center;
       gap: 12px;
       padding: 12px 16px 12px 0;
-      background: rgba(26, 28, 35, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      color: #fff;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      color: rgba(0, 0, 0, 0.87);
       min-width: 280px;
       max-width: 400px;
       animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
       overflow: hidden;
     }
 
-    /* Types */
-    .success {
-      border-left: 4px solid #10b981;
-    }
-    .success .toast-indicator {
-      background: #10b981;
-      height: 100%;
-      width: 4px;
-      position: absolute;
-      left: 0;
-    }
-
-    .error {
-      border-left: 4px solid #ef4444;
-    }
-    .error .toast-indicator {
-      background: #ef4444;
-      height: 100%;
-      width: 4px;
-      position: absolute;
-      left: 0;
-    }
-
-    .info {
-      border-left: 4px solid #3b82f6;
-    }
-    .info .toast-indicator {
-      background: #3b82f6;
-      height: 100%;
-      width: 4px;
-      position: absolute;
-      left: 0;
-    }
-
-    .toast-content {
-      flex: 1;
+    .toast-type-icon {
+      display: flex;
+      align-items: center;
       margin-left: 16px;
+      flex-shrink: 0;
     }
+    .success .toast-type-icon { color: #46a35e; }
+    .error .toast-type-icon { color: #f44336; }
+    .info .toast-type-icon { color: #3f51b5; }
+
+    .success { border-left: 4px solid #46a35e; }
+    .error { border-left: 4px solid #f44336; }
+    .info { border-left: 4px solid #3f51b5; }
+
+    .toast-indicator { display: none; }
+
+    .toast-content { flex: 1; }
 
     .toast-message {
       margin: 0;
       font-size: 0.9rem;
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'DM Sans', system-ui, sans-serif;
       font-weight: 500;
       line-height: 1.4;
     }
@@ -93,7 +79,7 @@ import { Component, ChangeDetectionStrategy, model, input, OnDestroy, effect } f
     .toast-close {
       background: none;
       border: none;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(0, 0, 0, 0.38);
       font-size: 1.5rem;
       cursor: pointer;
       padding: 0;
@@ -102,7 +88,7 @@ import { Component, ChangeDetectionStrategy, model, input, OnDestroy, effect } f
     }
 
     .toast-close:hover {
-      color: white;
+      color: rgba(0, 0, 0, 0.87);
     }
 
     @keyframes slideIn {

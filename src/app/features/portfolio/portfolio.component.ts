@@ -5,11 +5,12 @@ import { ActiveSubscription } from '../../core/models/fund.model';
 import { CurrencyCopPipe } from '../../shared/currency-cop.pipe';
 import { ToastComponent } from '../../shared/toast.component';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { IconComponent } from '../../shared/icon.component';
 
 @Component({
   selector: 'app-portfolio',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, CurrencyCopPipe, ToastComponent, ConfirmDialogComponent],
+  imports: [DatePipe, CurrencyCopPipe, ToastComponent, ConfirmDialogComponent, IconComponent],
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.scss']
 })

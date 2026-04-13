@@ -1,27 +1,44 @@
 <nav class="main-navbar" aria-label="Navegación principal">
   <div class="navbar-content">
     <div class="brand">
-      <span class="logo-icon">▲</span>
+      <div class="logo-wrapper">
+        <app-icon class="logo-icon" name="chart-line" [size]="22" />
+      </div>
       <h1>Inversiones</h1>
     </div>
 
     <ul class="nav-links">
       <li>
-        <a routerLink="/catalog" routerLinkActive="active" class="nav-item">Catálogo</a>
+        <a routerLink="/catalog" routerLinkActive="active" class="nav-item">
+          <app-icon name="folder-open" [size]="16" />
+          Catálogo
+        </a>
       </li>
       <li>
-        <a routerLink="/portfolio" routerLinkActive="active" class="nav-item">Portafolio</a>
+        <a routerLink="/portfolio" routerLinkActive="active" class="nav-item">
+          <app-icon name="building" [size]="16" />
+          Portafolio
+        </a>
       </li>
       <li>
-        <a routerLink="/history" routerLinkActive="active" class="nav-item">Historial</a>
+        <a routerLink="/history" routerLinkActive="active" class="nav-item">
+          <app-icon name="receipt" [size]="16" />
+          Historial
+        </a>
       </li>
     </ul>
 
     <div class="global-balance">
-      <span class="label">Saldo Disponible</span>
-      <strong class="amount highlight">{{ store.balance() | currencyCop }}</strong>
+      <div class="balance-info">
+        <span class="label">Saldo Disponible</span>
+        <strong class="amount highlight">{{ store.balance() | currencyCop }}</strong>
+      </div>
+      <div class="balance-icon">
+        <app-icon name="wallet" [size]="20" />
+      </div>
     </div>
   </div>
+  <div class="navbar-glow"></div>
 </nav>
 
 <main class="main-layout">

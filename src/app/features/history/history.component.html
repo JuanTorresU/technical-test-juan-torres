@@ -1,49 +1,52 @@
 <div class="history-container">
-  <header class="history-header">
+  <header class="section-header">
     <h2>Historial de Movimientos</h2>
     <p>Revisa la bitácora cronológica de todas tus inversiones y cancelaciones.</p>
   </header>
 
   @if (store.sortedTransactions().length > 0) {
-    <table class="responsive-table">
-      <thead>
-        <tr>
-          <th>Fondo / Servicio</th>
-          <th>Movimiento</th>
-          <th>Monto</th>
-          <th>Fecha y Hora</th>
-          <th>Notificación</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (tx of store.sortedTransactions(); track tx.id) {
+    <div class="table-card">
+      <table class="responsive-table">
+        <thead>
           <tr>
-            <td data-label="Fondo">
-              <strong>{{ tx.fundName }}</strong>
-            </td>
-            <td data-label="Movimiento">
-              <span class="badge" [class.badge-blue]="tx.type === 'subscription'" [class.badge-green]="tx.type === 'cancellation'">
-                {{ tx.type === 'subscription' ? '💸 Suscrito' : '💰 Devuelto' }}
-              </span>
-            </td>
-            <td data-label="Monto">
-              <span class="amount-highlight" [class.amount-debit]="tx.type === 'subscription'" [class.amount-credit]="tx.type === 'cancellation'">
-                {{ tx.type === 'subscription' ? '-' : '+' }} {{ tx.amount | currencyCop }}
-              </span>
-            </td>
-            <td data-label="Fecha y Hora">
-              {{ tx.createdAt | date:'medium' }}
-            </td>
-            <td data-label="Notificación">
-              <span class="badge badge-gray">{{ tx.notification }}</span>
-            </td>
+            <th>Fondo / Servicio</th>
+            <th>Movimiento</th>
+            <th>Monto</th>
+            <th>Fecha y Hora</th>
+            <th>Notificación</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (tx of store.sortedTransactions(); track tx.id) {
+            <tr>
+              <td data-label="Fondo">
+                <strong>{{ tx.fundName }}</strong>
+              </td>
+              <td data-label="Movimiento">
+                <span class="badge" [class.badge-blue]="tx.type === 'subscription'" [class.badge-green]="tx.type === 'cancellation'">
+                  <app-icon [name]="tx.type === 'subscription' ? 'arrow-up-right' : 'arrow-down-left'" [size]="14" />
+                  {{ tx.type === 'subscription' ? ' Suscrito' : ' Devuelto' }}
+                </span>
+              </td>
+              <td data-label="Monto">
+                <span class="amount-highlight" [class.amount-debit]="tx.type === 'subscription'" [class.amount-credit]="tx.type === 'cancellation'">
+                  {{ tx.type === 'subscription' ? '-' : '+' }} {{ tx.amount | currencyCop }}
+                </span>
+              </td>
+              <td data-label="Fecha y Hora">
+                {{ tx.createdAt | date:'medium' }}
+              </td>
+              <td data-label="Notificación">
+                <span class="badge badge-gray">{{ tx.notification }}</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   } @else {
     <div class="empty-state">
-      <span class="empty-icon">🧾</span>
+      <span class="empty-icon"><app-icon name="receipt" [size]="48" /></span>
       <h3>No hay movimientos</h3>
       <p>Aún no has participado en fondos ni has generado giros dentro de la plataforma.</p>
     </div>

@@ -1,5 +1,5 @@
 <div class="catalog-container">
-  <header class="catalog-header">
+  <header class="section-header">
     <h2>Catálogo de Fondos</h2>
     <p>Explora nuestras alternativas y potencia tu portafolio.</p>
   </header>
@@ -10,48 +10,51 @@
     </div>
   } @else if (store.error()) {
     <div class="empty-state">
-      <span class="empty-icon">⚠️</span>
+      <span class="empty-icon"><app-icon name="alert-triangle" [size]="48" /></span>
       <h3>Algo salió mal</h3>
       <p>{{ store.error() }}</p>
     </div>
   } @else {
     @if (store.availableFunds().length > 0) {
-      <table class="responsive-table">
-        <thead>
-          <tr>
-            <th>Fondo de Inversión</th>
-            <th>Categoría</th>
-            <th>Monto Mínimo</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (fund of store.availableFunds(); track fund.id) {
+      <div class="table-card">
+        <table class="responsive-table">
+          <thead>
             <tr>
-              <td data-label="Fondo">
-                <strong>{{ fund.name }}</strong>
-              </td>
-              <td data-label="Categoría">
-                <span class="badge badge-blue">{{ fund.category }}</span>
-              </td>
-              <td data-label="Monto Mínimo">
-                <span class="amount-highlight">{{ fund.minimumAmount | currencyCop }}</span>
-              </td>
-              <td data-label="">
-                <button 
-                  class="btn btn-primary btn--full" 
-                  (click)="openSubscribeModal(fund)"
-                  [disabled]="store.balance() < fund.minimumAmount">
-                  Suscribirme
-                </button>
-              </td>
+              <th>Fondo de Inversión</th>
+              <th>Categoría</th>
+              <th>Monto Mínimo</th>
+              <th>Acción</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (fund of store.availableFunds(); track fund.id) {
+              <tr>
+                <td data-label="Fondo">
+                  <strong>{{ fund.name }}</strong>
+                </td>
+                <td data-label="Categoría">
+                  <span class="badge badge-blue">{{ fund.category }}</span>
+                </td>
+                <td data-label="Monto Mínimo">
+                  <span class="amount-highlight">{{ fund.minimumAmount | currencyCop }}</span>
+                </td>
+                <td data-label="">
+                  <button
+                    class="btn btn-subscribe"
+                    (click)="openSubscribeModal(fund)"
+                    [disabled]="store.balance() < fund.minimumAmount">
+                    <app-icon name="arrow-up-right" [size]="14" />
+                    Suscribirse
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     } @else {
       <div class="empty-state">
-        <span class="empty-icon">🏦</span>
+        <span class="empty-icon"><app-icon name="building" [size]="48" /></span>
         <h3>No hay fondos disponibles</h3>
         <p>Ya estás suscrito en la totalidad de nuestras opciones operativas.</p>
       </div>
@@ -63,27 +66,50 @@
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" tabindex="-1">
       <div class="modal-header">
-        <h3>Suscribirse a {{ selectedFund()?.name }}</h3>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
+        <div>
+          <h3>Suscribirse a Fondo</h3>
+          <p class="modal-subtitle">Configura tu inversión en <strong>{{ selectedFund()?.name }}</strong></p>
+        </div>
+        <button class="close-btn" (click)="closeModal()" aria-label="Cerrar">
+          <app-icon name="x" [size]="20" />
+        </button>
       </div>
-      
+
       <form [formGroup]="subscribeForm" (ngSubmit)="onSubmit()">
         <div class="modal-body">
-          <div class="balance-info">
-            <span>Saldo disponible:</span>
-            <strong>{{ store.balance() | currencyCop }}</strong>
+          <div class="fund-summary">
+            <div class="fund-summary-row">
+              <span class="fund-summary-label">Fondo</span>
+              <span class="fund-summary-value">{{ selectedFund()?.name }}</span>
+            </div>
+            <div class="fund-summary-row">
+              <span class="fund-summary-label">Categoría</span>
+              <span class="badge badge-blue">{{ selectedFund()?.category }}</span>
+            </div>
+            <div class="fund-summary-row">
+              <span class="fund-summary-label">Mínimo requerido</span>
+              <span class="fund-summary-value mono">{{ selectedFund()?.minimumAmount | currencyCop }}</span>
+            </div>
+            <div class="fund-summary-row">
+              <span class="fund-summary-label">Tu saldo</span>
+              <span class="fund-summary-value mono accent">{{ store.balance() | currencyCop }}</span>
+            </div>
           </div>
 
           <div class="form-group">
             <label for="amount">Monto a Invertir</label>
-            <input 
-              #amountInput
-              id="amount" 
-              type="number" 
-              formControlName="amount" 
-              [class.is-invalid]="subscribeForm.get('amount')?.invalid && subscribeForm.get('amount')?.touched"
-              placeholder="Ingresa el monto"
-            />
+            <div class="input-wrapper" [class.is-invalid]="subscribeForm.get('amount')?.invalid && subscribeForm.get('amount')?.touched" [class.is-focused]="amountFocused()">
+              <span class="input-prefix">COP</span>
+              <input
+                #amountInput
+                id="amount"
+                type="number"
+                formControlName="amount"
+                placeholder="0"
+                (focus)="amountFocused.set(true)"
+                (blur)="amountFocused.set(false)"
+              />
+            </div>
             @if (subscribeForm.get('amount')?.hasError('required') && subscribeForm.get('amount')?.touched) {
               <small class="error-message">El monto es requerido.</small>
             }
@@ -96,22 +122,42 @@
           </div>
 
           <div class="form-group">
-            <label for="notification">Medio de Notificación</label>
-            <select id="notification" formControlName="notification">
-              <option value="" disabled>Selecciona un medio</option>
-              <option value="email">Correo Electrónico (Email)</option>
-              <option value="sms">Mensaje de Texto (SMS)</option>
-            </select>
+            <label>Medio de Notificación</label>
+            <div class="radio-group">
+              <label class="radio-card" [class.radio-card--selected]="subscribeForm.get('notification')?.value === 'email'">
+                <input type="radio" formControlName="notification" value="email" />
+                <app-icon name="mail" [size]="20" />
+                <div class="radio-card-text">
+                  <span class="radio-card-title">Email</span>
+                  <span class="radio-card-desc">Correo electrónico</span>
+                </div>
+              </label>
+              <label class="radio-card" [class.radio-card--selected]="subscribeForm.get('notification')?.value === 'sms'">
+                <input type="radio" formControlName="notification" value="sms" />
+                <app-icon name="smartphone" [size]="20" />
+                <div class="radio-card-text">
+                  <span class="radio-card-title">SMS</span>
+                  <span class="radio-card-desc">Mensaje de texto</span>
+                </div>
+              </label>
+            </div>
             @if (subscribeForm.get('notification')?.hasError('required') && subscribeForm.get('notification')?.touched) {
-              <small class="error-message">Este campo es obligatorio.</small>
+              <small class="error-message">Selecciona un medio de notificación.</small>
             }
           </div>
         </div>
-        
+
         <div class="modal-footer">
-          <button type="button" class="btn btn-cancel" (click)="closeModal()">Cancelar</button>
+          <button type="button" class="btn btn-cancel" (click)="closeModal()" [disabled]="isProcessing()">
+            Cancelar
+          </button>
           <button type="submit" class="btn btn-submit" [disabled]="subscribeForm.invalid || isProcessing()">
-            Aceptar
+            @if (isProcessing()) {
+              <app-icon name="loader" [size]="18" class="spin" />
+              Procesando...
+            } @else {
+              Confirmar Suscripción
+            }
           </button>
         </div>
       </form>

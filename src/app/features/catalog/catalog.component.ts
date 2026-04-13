@@ -5,6 +5,7 @@ import { InvestmentStore } from '../../state/investment.store';
 import { Fund } from '../../core/models/fund.model';
 import { CurrencyCopPipe } from '../../shared/currency-cop.pipe';
 import { ToastComponent } from '../../shared/toast.component';
+import { IconComponent } from '../../shared/icon.component';
 
 const ERROR_MESSAGES: Record<string, string> = {
   INSUFFICIENT_BALANCE: 'No tienes saldo suficiente para esta operación.',
@@ -16,7 +17,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 @Component({
   selector: 'app-catalog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, CurrencyCopPipe, ToastComponent],
+  imports: [ReactiveFormsModule, CurrencyCopPipe, ToastComponent, IconComponent],
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss']
 })
@@ -31,6 +32,7 @@ export class CatalogComponent implements OnInit {
   isModalOpen = signal(false);
   selectedFund = signal<Fund | null>(null);
   isProcessing = signal(false);
+  amountFocused = signal(false);
 
   // Reactive Toast State via Signals
   toastVisible = signal(false);

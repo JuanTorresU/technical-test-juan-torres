@@ -1,54 +1,56 @@
 <div class="portfolio-container">
-  <header class="portfolio-header">
+  <header class="section-header">
     <h2>Mi Portafolio</h2>
     <p>Gestiona tus suscripciones activas y mantén el control de tus rendimientos.</p>
   </header>
 
   @if (store.subscriptions().length > 0) {
-    <table class="responsive-table">
-      <thead>
-        <tr>
-          <th>Fondo Invertido</th>
-          <th>Categoría</th>
-          <th>Monto Invertido</th>
-          <th>Fecha Inicio</th>
-          <th>Notificación</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (sub of store.subscriptions(); track sub.fund.id) {
+    <div class="table-card">
+      <table class="responsive-table">
+        <thead>
           <tr>
-            <td data-label="Fondo Invertido">
-              <strong>{{ sub.fund.name }}</strong>
-            </td>
-            <td data-label="Categoría">
-              <span class="badge badge-green">{{ sub.fund.category }}</span>
-            </td>
-            <td data-label="Monto Invertido">
-              <span class="amount-highlight amount-blue">{{ sub.amount | currencyCop }}</span>
-            </td>
-            <td data-label="Fecha Inicio">
-              {{ sub.subscribedAt | date:'mediumDate' }}
-            </td>
-            <td data-label="Notificación">
-              <span class="text-upper text-sm">{{ sub.notification }}</span>
-            </td>
-            <td data-label="">
-              <button 
-                class="btn btn-danger btn--full" 
-                (click)="openConfirm(sub)" 
-                [disabled]="isCancelling()">
-                Cancelar Inversión
-              </button>
-            </td>
+            <th>Fondo Invertido</th>
+            <th>Categoría</th>
+            <th>Monto Invertido</th>
+            <th>Fecha Inicio</th>
+            <th>Notificación</th>
+            <th>Acción</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (sub of store.subscriptions(); track sub.fund.id) {
+            <tr>
+              <td data-label="Fondo Invertido">
+                <strong>{{ sub.fund.name }}</strong>
+              </td>
+              <td data-label="Categoría">
+                <span class="badge badge-green">{{ sub.fund.category }}</span>
+              </td>
+              <td data-label="Monto Invertido">
+                <span class="amount-highlight amount-blue">{{ sub.amount | currencyCop }}</span>
+              </td>
+              <td data-label="Fecha Inicio">
+                {{ sub.subscribedAt | date:'mediumDate' }}
+              </td>
+              <td data-label="Notificación">
+                <span class="badge badge-gray">{{ sub.notification }}</span>
+              </td>
+              <td data-label="">
+                <button
+                  class="btn btn-danger-outline"
+                  (click)="openConfirm(sub)"
+                  [disabled]="isCancelling()">
+                  Cancelar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   } @else {
     <div class="empty-state">
-      <span class="empty-icon">📂</span>
+      <span class="empty-icon"><app-icon name="folder-open" [size]="48" /></span>
       <h3>Aún no tienes inversiones</h3>
       <p>Dirígete al catálogo para suscribirte a tu primer fondo y verás aquí tus rendimientos.</p>
     </div>
