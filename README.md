@@ -12,11 +12,13 @@ Angular 21 (standalone, zoneless) · TypeScript strict · Signals para estado ·
 
 ## Decisiones técnicas
 
-- Repository pattern con `InjectionToken` para desacoplar la fuente de datos del store.
-- Estado global con Signals (`signal`, `computed`, `rxResource`). Sin NgRx — RxJS solo para la capa HTTP.
-- Tipado estricto sin `any`. Operaciones retornan `OperationResult` (union discriminada con errores tipados).
-- Persistencia en `localStorage` con rehidratación al iniciar y debounce al escribir.
-- Environments separados para desarrollo y producción (`environment.ts`).
+- **Repository Pattern & DI:** `InjectionToken` para desacoplar el origen de datos del store, facilitando pruebas e intercambio de fuentes.
+- **Mock de API:** Uso de **Mockfly** para simular rápidamente el backend y servir los datos.
+- **Estado Reactivo (Signals):** Store 100% zoneless con Angular 21 (`signal`, `computed`, `rxResource`). Sin NgRx; RxJS limitado a peticiones HTTP.
+- **Tipado Estricto (OperationResult):** Proyecto libre de `any`. Uniones discriminadas para el manejo predecible de errores a nivel del compilador.
+- **Persistencia Local:** Almacenamiento en `localStorage` con rehidratación al inicio y **debounce** para evitar llamadas excesivas de escritura.
+- **Entornos:** Archivos `environment.ts` independientes para separar configuración local y de producción en AWS.
+
 
 ## Ejecución local
 

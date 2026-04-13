@@ -10,7 +10,7 @@ describe('AppComponent', () => {
       imports: [AppComponent],
       providers: [
         provideRouter([]),
-        { provide: InvestmentStore, useValue: { balance: signal(0) } }
+        { provide: InvestmentStore, useValue: { balance: signal(0), balanceLoading: signal(false) } }
       ]
     }).compileComponents();
   });
