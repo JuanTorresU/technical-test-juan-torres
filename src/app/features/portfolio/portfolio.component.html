@@ -32,11 +32,11 @@
               {{ sub.subscribedAt | date:'mediumDate' }}
             </td>
             <td data-label="Notificación">
-              <span class="text-upper">{{ sub.notification }}</span>
+              <span class="text-upper text-sm">{{ sub.notification }}</span>
             </td>
             <td data-label="">
               <button 
-                class="btn btn-danger w-full-max-200" 
+                class="btn btn-danger btn--full" 
                 (click)="openConfirm(sub)" 
                 [disabled]="isCancelling()">
                 Cancelar Inversión

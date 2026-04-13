@@ -115,8 +115,9 @@ body {
 }
 
 /* Utility Classes */
-.w-full-max-200 { width: 100%; max-width: 200px; }
-.text-upper { text-transform: uppercase; font-size: 0.85rem; }
+.btn.btn--full { width: 100%; max-width: 200px; }
+.text-upper { text-transform: uppercase; }
+.text-sm { font-size: 0.85rem; }
 
 .badge {
   display: inline-block;

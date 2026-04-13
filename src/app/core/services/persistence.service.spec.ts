@@ -62,6 +62,14 @@ describe('PersistenceService', () => {
       
       expect(service.clearAll).toHaveBeenCalled();
     });
+
+    it('should silently ignore non-quota write errors', () => {
+      spyOn(localStorage, 'setItem').and.throwError('Some other error');
+      spyOn(service, 'clearAll').and.callThrough();
+      
+      expect(() => service.write('BALANCE', 0)).not.toThrow();
+      expect(service.clearAll).not.toHaveBeenCalled();
+    });
   });
 
   describe('clearItem and clearAll', () => {

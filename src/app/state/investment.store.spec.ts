@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { InvestmentStore } from './investment.store';
 import { FundRepository } from '../core/repositories/fund.repository';
@@ -133,7 +133,8 @@ describe('InvestmentStore', () => {
       // Should have 1 subscription and 1 cancellation transaction
       const transactions = store.transactions();
       expect(transactions.length).toBe(2);
-      expect(transactions[0].type).toBe('cancellation');
+      expect(transactions.some(t => t.type === 'cancellation')).toBeTrue();
+      expect(transactions.some(t => t.type === 'subscription')).toBeTrue();
     });
 
     it('should fail if cancelling non-existent subscription (error al cancelar fondo inexistente)', () => {
@@ -157,5 +158,33 @@ describe('InvestmentStore', () => {
       expect(updatedAvailable.length).toBe(1);
       expect(updatedAvailable[0].id).toBe(mockFunds[1].id);
     });
+  });
+
+  describe('sortedTransactions computation', () => {
+    it('should return transactions sorted by date descending', () => {
+      store.loadFunds();
+      store.subscribeTo(mockFunds[0], 50000, 'email');
+      store.cancelSubscription(mockFunds[0].id);
+      
+      const sorted = store.sortedTransactions();
+      expect(sorted.length).toBe(2);
+      expect(new Date(sorted[0].createdAt).getTime()).toBeGreaterThanOrEqual(new Date(sorted[1].createdAt).getTime());
+    });
+  });
+
+  describe('persistence effects', () => {
+    it('should write to localStorage with debounce when state changes', fakeAsync(() => {
+      // Ignore initial execution of effects
+      mockPersistenceService.write.calls.reset();
+      
+      store.balance.set(100);
+      TestBed.flushEffects();
+      
+      expect(mockPersistenceService.write).not.toHaveBeenCalled();
+      
+      tick(300);
+      
+      expect(mockPersistenceService.write).toHaveBeenCalledWith('BALANCE', 100);
+    }));
   });
 });

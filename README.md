@@ -36,7 +36,7 @@ Ejecutar la suite de pruebas unitarias implementada (ej. `investment.store.spec.
 npm run test
 ```
 
-## Configuración y Deploy a AWS Amplify (Fase 13)
+## Configuración y Deploy a AWS Amplify
 
 El despliegue está pensado y configurado para conectarse directamente a la rama de GitHub/GitLab/Bitbucket vía **AWS Amplify Hosting**. 
 
