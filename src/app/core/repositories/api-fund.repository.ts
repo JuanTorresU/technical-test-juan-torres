@@ -5,6 +5,7 @@ import { FundRepository } from './fund.repository';
 import { Fund } from '../models/fund.model';
 import { API_URL } from '../tokens/api.token';
 
+/** Implementación HTTP del repositorio de fondos */
 @Injectable()
 export class ApiFundRepository implements FundRepository {
   private http = inject(HttpClient);

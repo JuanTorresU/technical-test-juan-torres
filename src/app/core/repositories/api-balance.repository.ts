@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { BalanceRepository } from './balance.repository';
 import { API_URL } from '../tokens/api.token';
 
+/** Implementación HTTP del repositorio de saldo */
 @Injectable()
 export class ApiBalanceRepository implements BalanceRepository {
   private http = inject(HttpClient);

@@ -1,14 +1,16 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { InvestmentStore } from './investment.store';
 import { FUND_REPOSITORY, FundRepository } from '../core/repositories/fund.repository';
+import { BALANCE_REPOSITORY } from '../core/repositories/balance.repository';
 import { PersistenceService } from '../core/services/persistence.service';
 import { Fund } from '../core/models/fund.model';
-import { INITIAL_BALANCE } from '../core/data/funds.mock';
 
+const INITIAL_BALANCE = 500000;
 describe('InvestmentStore', () => {
   let store: InvestmentStore;
   let mockFundRepository: jasmine.SpyObj<FundRepository>;
+  let mockBalanceRepository: any;
   let mockPersistenceService: jasmine.SpyObj<PersistenceService>;
 
   const mockFunds: Fund[] = [
@@ -20,6 +22,10 @@ describe('InvestmentStore', () => {
     mockFundRepository = jasmine.createSpyObj('FundRepository', ['getFunds']);
     // Setup default mock return
     mockFundRepository.getFunds.and.returnValue(of(mockFunds));
+
+    mockBalanceRepository = {
+      getBalance: jasmine.createSpy('getBalance').and.returnValue(of({ balance: INITIAL_BALANCE }))
+    };
 
     mockPersistenceService = jasmine.createSpyObj('PersistenceService', ['read', 'write', 'clearItem', 'clearAll']);
     
@@ -35,6 +41,7 @@ describe('InvestmentStore', () => {
       providers: [
         InvestmentStore,
         { provide: FUND_REPOSITORY, useValue: mockFundRepository },
+        { provide: BALANCE_REPOSITORY, useValue: mockBalanceRepository },
         { provide: PersistenceService, useValue: mockPersistenceService }
       ]
     });

@@ -11,6 +11,11 @@ import {
   NotificationMethod
 } from '../core/models/fund.model';
 
+/**
+ * Store central de inversiones.
+ * Gestiona el estado reactivo de saldo, suscripciones y transacciones
+ * usando Angular Signals, con persistencia automática en localStorage.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -19,27 +24,27 @@ export class InvestmentStore {
   private readonly balanceRepository = inject(BALANCE_REPOSITORY);
   private readonly persistenceService = inject(PersistenceService);
 
-  private readonly FALLBACK_BALANCE = 0;
-
   private getPersistedBalance(): number | null {
     return this.persistenceService.read<number | null>('BALANCE', null);
   }
 
-  // Declarative Resource for fetching
+  // Recurso declarativo para obtener el saldo inicial desde la API
   private readonly balanceResource = rxResource({
     stream: () => this.balanceRepository.getBalance()
   });
 
-  // Writable Signals (State)
+  // Estado principal (signals escribibles)
   readonly balance = signal<number>(this.getPersistedBalance() ?? 0);
   readonly subscriptions = signal<ActiveSubscription[]>(this.persistenceService.read<ActiveSubscription[]>('SUBSCRIPTIONS', []));
   readonly transactions = signal<Transaction[]>(this.persistenceService.read<Transaction[]>('TRANSACTIONS', []));
-  // rxResource automatically handles fetching
+
+  // Recurso declarativo para obtener el catálogo de fondos
   private readonly fundsResource = rxResource({
     stream: () => this.fundRepository.getFunds(),
     defaultValue: [] as Fund[]
   });
 
+  // Estado derivado (signals computadas de solo lectura)
   readonly funds = computed(() => {
     if (this.fundsResource.error()) return [];
     return this.fundsResource.value() || [];
@@ -51,7 +56,7 @@ export class InvestmentStore {
   });
 
   constructor() {
-    // Hidratar desde API solo si no hay dato persistido
+    // Hidratar saldo desde API solo si no hay dato persistido en localStorage
     effect(() => {
       const api = this.balanceResource.value()?.balance;
       if (api !== undefined && this.getPersistedBalance() === null) {
@@ -64,6 +69,7 @@ export class InvestmentStore {
       }
     });
 
+    // Persistir estado en localStorage con debounce de 300ms
     effect((onCleanup) => {
       const b = this.balance();
       const s = this.subscriptions();
@@ -78,16 +84,18 @@ export class InvestmentStore {
     });
   }
 
-  // Computed Signals
+  /** IDs de fondos a los que el usuario ya está suscrito */
   readonly subscribedFundIds = computed(() =>
     new Set(this.subscriptions().map(sub => sub.fund.id))
   );
 
+  /** Fondos del catálogo que aún no tienen suscripción activa */
   readonly availableFunds = computed(() => {
     const subscribedSet = this.subscribedFundIds();
     return this.funds().filter(fund => !subscribedSet.has(fund.id));
   });
 
+  /** Transacciones ordenadas de más reciente a más antigua */
   readonly sortedTransactions = computed(() =>
     [...this.transactions()].sort((a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -100,11 +108,14 @@ export class InvestmentStore {
       : `tx-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   }
 
-  // Actions
+  // ── Acciones ──
+
+  /** Recarga el catálogo de fondos desde la API */
   loadFunds(): void {
     this.fundsResource.reload();
   }
 
+  /** Suscribe al usuario a un fondo: valida reglas de negocio, descuenta saldo y registra la transacción */
   subscribeTo(fund: Fund, amount: number, notification: NotificationMethod): OperationResult {
     if (!Number.isFinite(amount) || isNaN(amount) || amount <= 0) {
       return { success: false, error: 'BELOW_MINIMUM' };
@@ -124,10 +135,10 @@ export class InvestmentStore {
 
     const timestamp = new Date().toISOString();
 
-    // Deduct balance
+    // Descontar saldo
     this.balance.update(b => b - amount);
 
-    // Add active subscription
+    // Registrar suscripción activa
     const newSubscription: ActiveSubscription = {
       fund,
       amount,
@@ -136,7 +147,7 @@ export class InvestmentStore {
     };
     this.subscriptions.update(subs => [...subs, newSubscription]);
 
-    // Log transaction
+    // Registrar transacción en el historial
     const newTransaction: Transaction = {
       id: this.generateId(),
       fundId: fund.id,
@@ -151,6 +162,7 @@ export class InvestmentStore {
     return { success: true };
   }
 
+  /** Cancela una suscripción: reintegra el saldo y registra la cancelación */
   cancelSubscription(fundId: number): OperationResult {
     const subscription = this.subscriptions().find(s => s.fund.id === fundId);
 
@@ -160,20 +172,20 @@ export class InvestmentStore {
 
     const timestamp = new Date().toISOString();
 
-    // Reintegrate balance
+    // Reintegrar saldo
     this.balance.update(b => b + subscription.amount);
 
-    // Remove subscription
+    // Eliminar suscripción activa
     this.subscriptions.update(subs => subs.filter(s => s.fund.id !== fundId));
 
-    // Log transaction cancellation
+    // Registrar cancelación en el historial
     const newTransaction: Transaction = {
       id: this.generateId(),
       fundId: subscription.fund.id,
       fundName: subscription.fund.name,
       type: 'cancellation',
       amount: subscription.amount,
-      notification: subscription.notification, // Fallback to last known method
+      notification: subscription.notification,
       createdAt: timestamp
     };
     this.transactions.update(txs => [newTransaction, ...txs]);

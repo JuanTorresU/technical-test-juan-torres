@@ -3,9 +3,12 @@ frontend:
   phases:
     preBuild:
       commands:
+        - nvm install 20
+        - nvm use 20
         - npm ci
     build:
       commands:
+        - npm run test -- --watch=false --browsers=ChromeHeadless
         - npm run build
   artifacts:
     baseDirectory: dist/technical-test-funds-app/browser
@@ -13,4 +16,15 @@ frontend:
       - '**/*'
   cache:
     paths:
-      - node_modules/**/*
+      - .npm/**/*
+customHeaders:
+  - pattern: '**/*'
+    headers:
+      - key: 'X-Frame-Options'
+        value: 'DENY'
+      - key: 'X-XSS-Protection'
+        value: '1; mode=block'
+      - key: 'X-Content-Type-Options'
+        value: 'nosniff'
+      - key: 'Strict-Transport-Security'
+        value: 'max-age=31536000; includeSubDomains'

@@ -129,6 +129,7 @@ import { Component, ChangeDetectionStrategy, input, output, model } from '@angul
     }
   `]
 })
+/** Diálogo modal de confirmación reutilizable con título, mensaje y acciones confirmar/cancelar */
 export class ConfirmDialogComponent {
   title = input.required<string>();
   message = input.required<string>();

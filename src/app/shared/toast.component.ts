@@ -103,29 +103,33 @@ import { IconComponent } from './icon.component';
     }
   `]
 })
+/**
+ * Componente de notificación flotante (toast).
+ * Se oculta automáticamente después de 3.5 segundos.
+ * Soporta tipos: success, error, info.
+ */
 export class ToastComponent implements OnDestroy {
   message = input.required<string>();
   type = input<'success' | 'error' | 'info'>('info');
   visible = model<boolean>(false);
-  
+
   private timeoutId: any;
 
   constructor() {
     effect(() => {
       const isVisible = this.visible();
-      // Las mutaciones se disparan desde un macrotask asincrono, evitando ciclos
-      // restrictivos de Angular en "allowSignalWrites"
+      // El setTimeout evita escribir signals dentro del ciclo síncrono del effect
       if (isVisible) {
         if (this.timeoutId) {
           clearTimeout(this.timeoutId);
         }
-        
-        // Auto-hide after 3.5 seconds
+
+        // Auto-ocultar tras 3.5 segundos
         this.timeoutId = setTimeout(() => {
           this.closeToast();
         }, 3500);
       }
-    }); // No allowSignalWrites: true flag required anymore
+    });
   }
 
   closeToast() {

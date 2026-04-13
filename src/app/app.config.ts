@@ -10,6 +10,11 @@ import { ApiBalanceRepository } from './core/repositories/api-balance.repository
 import { API_URL } from './core/tokens/api.token';
 import { environment } from '../environments/environment';
 
+/**
+ * Configuración raíz de la aplicación.
+ * Registra detección de cambios sin Zone.js, rutas, cliente HTTP
+ * y las implementaciones concretas de los repositorios.
+ */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),

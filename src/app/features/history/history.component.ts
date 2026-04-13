@@ -11,6 +11,7 @@ import { IconComponent } from '../../shared/icon.component';
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss']
 })
+/** Vista del historial de transacciones (suscripciones y cancelaciones) */
 export class HistoryComponent {
   readonly store = inject(InvestmentStore);
 }

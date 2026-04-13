@@ -1,9 +1,15 @@
 import { Injectable } from '@angular/core';
 
+/**
+ * Servicio de persistencia en localStorage.
+ * Gestiona lectura/escritura tipada con validación de esquema
+ * y manejo de errores de cuota.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class PersistenceService {
+  /** Llaves usadas en localStorage para cada tipo de dato */
   private readonly KEYS = {
     BALANCE: 'fm_balance',
     SUBSCRIPTIONS: 'fm_subscriptions',

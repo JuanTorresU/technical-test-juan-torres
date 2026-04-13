@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { InvestmentStore } from '../../state/investment.store';
 import { ActiveSubscription } from '../../core/models/fund.model';
@@ -14,14 +14,19 @@ import { IconComponent } from '../../shared/icon.component';
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.scss']
 })
+/**
+ * Portafolio del usuario.
+ * Muestra las suscripciones activas y permite cancelarlas
+ * con un diálogo de confirmación previo.
+ */
 export class PortfolioComponent {
   readonly store = inject(InvestmentStore);
 
-  // Status del ConfirmDialog
+  // Estado del diálogo de confirmación
   showConfirmDialog = signal(false);
   fundToCancel = signal<ActiveSubscription | null>(null);
 
-  // Status del Toast
+  // Estado del toast de notificaciones
   toastVisible = signal(false);
   toastMessage = signal('');
   toastType = signal<'success' | 'error' | 'info'>('info');
@@ -45,6 +50,7 @@ export class PortfolioComponent {
     this.toastVisible.set(true);
   }
 
+  /** Ejecuta la cancelación tras confirmación del usuario */
   executeCancellation() {
     if (this.isCancelling()) return;
     this.isCancelling.set(true);
@@ -55,7 +61,7 @@ export class PortfolioComponent {
       return;
     }
 
-    // Remove dialog upfront smoothly
+    // Cerrar diálogo antes de procesar para transición fluida
     this.showConfirmDialog.set(false);
     
     const result = this.store.cancelSubscription(sub.fund.id);

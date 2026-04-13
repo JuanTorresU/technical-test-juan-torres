@@ -11,6 +11,7 @@ import { IconComponent } from './shared/icon.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
+/** Componente raíz: contiene la navegación principal y el router outlet */
 export class AppComponent {
   readonly store = inject(InvestmentStore);
 }

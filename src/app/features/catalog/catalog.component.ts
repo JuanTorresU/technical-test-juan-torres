@@ -7,6 +7,7 @@ import { CurrencyCopPipe } from '../../shared/currency-cop.pipe';
 import { ToastComponent } from '../../shared/toast.component';
 import { IconComponent } from '../../shared/icon.component';
 
+/** Mensajes de error mapeados por código de operación */
 const ERROR_MESSAGES: Record<string, string> = {
   INSUFFICIENT_BALANCE: 'No tienes saldo suficiente para esta operación.',
   ALREADY_SUBSCRIBED: 'Ya te encuentras suscrito a este fondo.',
@@ -21,6 +22,11 @@ const ERROR_MESSAGES: Record<string, string> = {
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss']
 })
+/**
+ * Catálogo de fondos disponibles.
+ * Permite al usuario ver fondos, abrir un modal de suscripción
+ * con validación de formulario reactivo, y ejecutar la suscripción.
+ */
 export class CatalogComponent implements OnInit {
   readonly store = inject(InvestmentStore);
   private fb = inject(FormBuilder);
@@ -28,13 +34,13 @@ export class CatalogComponent implements OnInit {
 
   @ViewChild('amountInput') amountInput!: ElementRef<HTMLInputElement>;
 
-  // Local State
+  // Estado local del modal
   isModalOpen = signal(false);
   selectedFund = signal<Fund | null>(null);
   isProcessing = signal(false);
   amountFocused = signal(false);
 
-  // Reactive Toast State via Signals
+  // Estado del toast de notificaciones
   toastVisible = signal(false);
   toastMessage = signal('');
   toastType = signal<'success' | 'error' | 'info'>('info');
@@ -63,6 +69,7 @@ export class CatalogComponent implements OnInit {
     }
   }
 
+  /** Abre el modal de suscripción configurando validadores dinámicos según el fondo seleccionado */
   openSubscribeModal(fund: Fund) {
     this.selectedFund.set(fund);
     this.subscribeForm.reset({
@@ -70,6 +77,7 @@ export class CatalogComponent implements OnInit {
       notification: ''
     });
 
+    // Validadores dinámicos: monto mínimo del fondo y máximo del saldo disponible
     this.subscribeForm.get('amount')?.setValidators([
       Validators.required,
       Validators.min(fund.minimumAmount),
@@ -79,7 +87,7 @@ export class CatalogComponent implements OnInit {
 
     this.isModalOpen.set(true);
 
-    // Focus input after render
+    // Enfocar el input de monto después del render
     afterNextRender(() => {
       if (this.amountInput?.nativeElement) {
         this.amountInput.nativeElement.focus();
@@ -99,6 +107,7 @@ export class CatalogComponent implements OnInit {
     this.toastVisible.set(true);
   }
 
+  /** Ejecuta la suscripción al fondo tras validar el formulario */
   async onSubmit() {
     if (this.subscribeForm.invalid) {
       this.subscribeForm.markAllAsTouched();
@@ -110,7 +119,7 @@ export class CatalogComponent implements OnInit {
 
     this.isProcessing.set(true);
 
-    // Simulate small api delay
+    // Simular latencia de red para feedback visual
     await new Promise(resolve => setTimeout(resolve, 600));
 
     const amount = Number(this.subscribeForm.get('amount')?.value);
