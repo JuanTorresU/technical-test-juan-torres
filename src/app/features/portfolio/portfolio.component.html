@@ -60,8 +60,10 @@
 <!-- Modal de Confirmacion -->
 <app-confirm-dialog
   [visible]="showConfirmDialog()"
-  [title]="'Confirmar Cancelación'"
-  [message]="'¿Estás seguro que deseas cancelar tu fondo ' + (fundToCancel()?.fund?.name || '') + '? El monto de ' + ((fundToCancel()?.amount || 0) | currencyCop) + ' será reintegrado a tu saldo disponible inmediatamente.'"
+  [title]="'Cancelar Inversión'"
+  [message]="'¿Estás seguro que deseas retirar tu inversión de ' + (fundToCancel()?.fund?.name || '') + '? El monto de ' + ((fundToCancel()?.amount || 0) | currencyCop) + ' será reintegrado a tu saldo disponible inmediatamente.'"
+  confirmText="Sí, Cancelar Inversión"
+  cancelText="Mantener Inversión"
   (confirmed)="executeCancellation()"
   (cancelled)="cancelDialog()">
 </app-confirm-dialog>

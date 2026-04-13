@@ -50,24 +50,20 @@ export class InvestmentStore {
     return this.fundsResource.value() || [];
   });
   readonly loading = computed(() => this.fundsResource.isLoading());
+  readonly balanceLoading = computed(() => this.balanceResource.isLoading());
   readonly error = computed(() => {
     const err = this.fundsResource.error();
     return err ? (err instanceof Error ? err.message : 'Error loading funds. Please try again.') : null;
   });
 
   constructor() {
-    // Hidratar saldo desde API solo si no hay dato persistido en localStorage
-    effect(() => {
-      const api = this.balanceResource.value()?.balance;
-      if (api !== undefined && this.getPersistedBalance() === null) {
-        this.balance.set(api);
-      }
-
-      const err = this.balanceResource.error();
-      if (err && this.getPersistedBalance() === null) {
-        console.error('Error fetching initial balance from API:', err);
-      }
-    });
+    // Si no hay saldo en localStorage, sincronizamos con la API
+    if (this.getPersistedBalance() === null) {
+      effect(() => {
+        const val = this.balanceResource.value()?.balance;
+        if (val !== undefined) this.balance.set(val);
+      });
+    }
 
     // Persistir estado en localStorage con debounce de 300ms
     effect((onCleanup) => {

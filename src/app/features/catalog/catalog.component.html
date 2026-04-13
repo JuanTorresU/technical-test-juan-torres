@@ -39,13 +39,18 @@
                   <span class="amount-highlight">{{ fund.minimumAmount | currencyCop }}</span>
                 </td>
                 <td data-label="">
-                  <button
-                    class="btn btn-subscribe"
-                    (click)="openSubscribeModal(fund)"
-                    [disabled]="store.balance() < fund.minimumAmount">
-                    <app-icon name="arrow-up-right" [size]="14" />
-                    Suscribirse
-                  </button>
+                  <span class="btn-tooltip-wrap" [class.btn-tooltip--active]="store.balance() < fund.minimumAmount">
+                    <button
+                      class="btn btn-subscribe"
+                      (click)="openSubscribeModal(fund)"
+                      [disabled]="store.balance() < fund.minimumAmount">
+                      <app-icon name="arrow-up-right" [size]="14" />
+                      Suscribirse
+                    </button>
+                    @if (store.balance() < fund.minimumAmount) {
+                      <span class="btn-tooltip">Saldo insuficiente para el mínimo de {{ fund.minimumAmount | currencyCop }}</span>
+                    }
+                  </span>
                 </td>
               </tr>
             }

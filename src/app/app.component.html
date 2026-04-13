@@ -31,7 +31,11 @@
     <div class="global-balance">
       <div class="balance-info">
         <span class="label">Saldo Disponible</span>
-        <strong class="amount highlight">{{ store.balance() | currencyCop }}</strong>
+        @if (store.balanceLoading() && store.balance() === 0) {
+          <div class="skeleton" style="width: 130px; height: 26px; border-radius: 4px; display: inline-block;"></div>
+        } @else {
+          <strong class="amount highlight">{{ store.balance() | currencyCop }}</strong>
+        }
       </div>
       <div class="balance-icon">
         <app-icon name="wallet" [size]="20" />
