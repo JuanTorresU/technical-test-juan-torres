@@ -11,7 +11,6 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, CurrencyCopPipe, ToastComponent, ConfirmDialogComponent],
-  imports: [CommonModule, CurrencyCopPipe, ToastComponent, ConfirmDialogComponent],
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.scss']
 })
