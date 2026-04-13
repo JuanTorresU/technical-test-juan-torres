@@ -28,10 +28,11 @@ export class InvestmentStore implements OnDestroy {
   readonly transactions = signal<Transaction[]>(this.persistenceService.read<Transaction[]>('TRANSACTIONS', []));
   // rxResource automatically handles fetching
   private readonly fundsResource = rxResource({
-    loader: () => this.fundRepository.getFunds()
+    stream: () => this.fundRepository.getFunds(),
+    defaultValue: [] as Fund[]
   });
 
-  readonly funds = computed(() => this.fundsResource.value() ?? []);
+  readonly funds = computed(() => this.fundsResource.value());
   readonly loading = computed(() => this.fundsResource.isLoading());
   readonly error = computed(() => {
     const err = this.fundsResource.error();
