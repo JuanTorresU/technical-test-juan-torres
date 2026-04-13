@@ -98,7 +98,7 @@ export class CatalogComponent implements OnInit {
     this.toastVisible.set(true);
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.subscribeForm.invalid) {
       this.subscribeForm.markAllAsTouched();
       return;
@@ -108,6 +108,9 @@ export class CatalogComponent implements OnInit {
     if (!fund) return;
 
     this.isProcessing.set(true);
+
+    // Simulate small api delay
+    await new Promise(resolve => setTimeout(resolve, 600));
 
     const amount = Number(this.subscribeForm.get('amount')?.value);
     const notification = this.subscribeForm.get('notification')?.value;

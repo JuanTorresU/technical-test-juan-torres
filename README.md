@@ -6,7 +6,7 @@ Aplicación SPA (Single Page Application) para la simulación de inversión y ge
 Desarrollada como prueba técnica.
 
 ## Stack Tecnológico
-- **Framework:** Angular 17+ (Standalone Components)
+- **Framework:** Angular 21 (Standalone Components)
 - **Lenguaje:** TypeScript 5+ (Tipado estricto)
 - **Estilos:** SCSS (Vanilla CSS para diseño premium oscuro)
 - **Estado Global:** Angular Signals (`signal`, `computed`, `effect`)
@@ -80,4 +80,4 @@ Dado que es una Single Page Application, debes configurar una regla de **Rewrite
 ---
 
 ## URL Desplegada
-*Pendiente.*  *(Reemplazar con la URL generada por AWS Amplify)*
+🔗 [https://main.d2bvyk6wah0lop.amplifyapp.com/](https://main.d2bvyk6wah0lop.amplifyapp.com/)

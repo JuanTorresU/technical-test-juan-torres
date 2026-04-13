@@ -7,7 +7,7 @@ import { Component, ChangeDetectionStrategy, input, output, model } from '@angul
   template: `
     @if (visible()) {
       <div class="backdrop" (click)="onCancel()">
-        <div class="dialog" (click)="$event.stopPropagation()">
+        <div class="dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" tabindex="-1">
           <header class="dialog-header">
             <h3>{{ title() }}</h3>
           </header>

@@ -61,7 +61,7 @@
 
 @if (isModalOpen() && selectedFund()) {
   <div class="modal-backdrop" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" tabindex="-1">
       <div class="modal-header">
         <h3>Suscribirse a {{ selectedFund()?.name }}</h3>
         <button class="close-btn" (click)="closeModal()">&times;</button>

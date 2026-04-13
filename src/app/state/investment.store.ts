@@ -52,11 +52,11 @@ export class InvestmentStore implements OnDestroy {
 
   // Computed Signals
   readonly subscribedFundIds = computed(() => 
-    this.subscriptions().map(sub => sub.fund.id)
+    new Set(this.subscriptions().map(sub => sub.fund.id))
   );
 
   readonly availableFunds = computed(() => {
-    const subscribedSet = new Set(this.subscribedFundIds());
+    const subscribedSet = this.subscribedFundIds();
     return this.funds().filter(fund => !subscribedSet.has(fund.id));
   });
 
@@ -102,7 +102,7 @@ export class InvestmentStore implements OnDestroy {
       return { success: false, error: 'INSUFFICIENT_BALANCE' };
     }
 
-    if (this.subscribedFundIds().includes(fund.id)) {
+    if (this.subscribedFundIds().has(fund.id)) {
       return { success: false, error: 'ALREADY_SUBSCRIBED' };
     }
 
