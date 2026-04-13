@@ -1,27 +1,37 @@
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FUND_REPOSITORY } from '../core/repositories/fund.repository';
+import { BALANCE_REPOSITORY } from '../core/repositories/balance.repository';
 import { PersistenceService } from '../core/services/persistence.service';
-import { 
-  Fund, 
-  ActiveSubscription, 
-  Transaction, 
-  OperationResult, 
-  NotificationMethod 
+import {
+  Fund,
+  ActiveSubscription,
+  Transaction,
+  OperationResult,
+  NotificationMethod
 } from '../core/models/fund.model';
-import { INITIAL_BALANCE } from '../core/data/funds.mock';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InvestmentStore {
   private readonly fundRepository = inject(FUND_REPOSITORY);
+  private readonly balanceRepository = inject(BALANCE_REPOSITORY);
   private readonly persistenceService = inject(PersistenceService);
 
+  private readonly FALLBACK_BALANCE = 0;
 
+  private getPersistedBalance(): number | null {
+    return this.persistenceService.read<number | null>('BALANCE', null);
+  }
+
+  // Declarative Resource for fetching
+  private readonly balanceResource = rxResource({
+    stream: () => this.balanceRepository.getBalance()
+  });
 
   // Writable Signals (State)
-  readonly balance = signal<number>(this.persistenceService.read<number>('BALANCE', INITIAL_BALANCE));
+  readonly balance = signal<number>(this.getPersistedBalance() ?? 0);
   readonly subscriptions = signal<ActiveSubscription[]>(this.persistenceService.read<ActiveSubscription[]>('SUBSCRIPTIONS', []));
   readonly transactions = signal<Transaction[]>(this.persistenceService.read<Transaction[]>('TRANSACTIONS', []));
   // rxResource automatically handles fetching
@@ -41,11 +51,24 @@ export class InvestmentStore {
   });
 
   constructor() {
+    // Hidratar desde API solo si no hay dato persistido
+    effect(() => {
+      const api = this.balanceResource.value()?.balance;
+      if (api !== undefined && this.getPersistedBalance() === null) {
+        this.balance.set(api);
+      }
+
+      const err = this.balanceResource.error();
+      if (err && this.getPersistedBalance() === null) {
+        console.error('Error fetching initial balance from API:', err);
+      }
+    });
+
     effect((onCleanup) => {
       const b = this.balance();
       const s = this.subscriptions();
       const t = this.transactions();
-      
+
       const id = setTimeout(() => {
         this.persistenceService.write('BALANCE', b);
         this.persistenceService.write('SUBSCRIPTIONS', s);
@@ -55,10 +78,8 @@ export class InvestmentStore {
     });
   }
 
-
-
   // Computed Signals
-  readonly subscribedFundIds = computed(() => 
+  readonly subscribedFundIds = computed(() =>
     new Set(this.subscriptions().map(sub => sub.fund.id))
   );
 
@@ -92,7 +113,7 @@ export class InvestmentStore {
     if (amount < fund.minimumAmount) {
       return { success: false, error: 'BELOW_MINIMUM' };
     }
-    
+
     if (this.balance() < amount) {
       return { success: false, error: 'INSUFFICIENT_BALANCE' };
     }
@@ -102,10 +123,10 @@ export class InvestmentStore {
     }
 
     const timestamp = new Date().toISOString();
-    
+
     // Deduct balance
     this.balance.update(b => b - amount);
-    
+
     // Add active subscription
     const newSubscription: ActiveSubscription = {
       fund,
@@ -114,7 +135,7 @@ export class InvestmentStore {
       subscribedAt: timestamp
     };
     this.subscriptions.update(subs => [...subs, newSubscription]);
-    
+
     // Log transaction
     const newTransaction: Transaction = {
       id: this.generateId(),
@@ -126,25 +147,25 @@ export class InvestmentStore {
       createdAt: timestamp
     };
     this.transactions.update(txs => [newTransaction, ...txs]);
-    
+
     return { success: true };
   }
 
   cancelSubscription(fundId: number): OperationResult {
     const subscription = this.subscriptions().find(s => s.fund.id === fundId);
-    
+
     if (!subscription) {
       return { success: false, error: 'NOT_FOUND' };
     }
 
     const timestamp = new Date().toISOString();
-    
+
     // Reintegrate balance
     this.balance.update(b => b + subscription.amount);
-    
+
     // Remove subscription
     this.subscriptions.update(subs => subs.filter(s => s.fund.id !== fundId));
-    
+
     // Log transaction cancellation
     const newTransaction: Transaction = {
       id: this.generateId(),
@@ -156,7 +177,7 @@ export class InvestmentStore {
       createdAt: timestamp
     };
     this.transactions.update(txs => [newTransaction, ...txs]);
-    
+
     return { success: true };
   }
 }
