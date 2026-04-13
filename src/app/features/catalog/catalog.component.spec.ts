@@ -22,8 +22,8 @@ describe('CatalogComponent', () => {
       balance: signal(500000),
       loading: signal(false),
       error: signal(null),
-      loadFunds: jasmine.createSpy('loadFunds'),
-      subscribeTo: jasmine.createSpy('subscribeTo').and.returnValue({ success: true })
+      loadFunds: vi.fn(),
+      subscribeTo: vi.fn().mockReturnValue({ success: true })
     };
 
     await TestBed.configureTestingModule({
@@ -52,7 +52,7 @@ describe('CatalogComponent', () => {
     const fund = storeMock.funds()[0];
     component.openSubscribeModal(fund);
     
-    expect(component.isModalOpen()).toBeTrue();
+    expect(component.isModalOpen()).toBe(true);
     expect(component.selectedFund()).toEqual(fund);
     expect(component.subscribeForm.get('amount')?.value).toBe(fund.minimumAmount);
   });
@@ -62,13 +62,13 @@ describe('CatalogComponent', () => {
     component.openSubscribeModal(fund);
     
     // amount is minimum, but notification is empty by default -> invalid
-    expect(component.subscribeForm.invalid).toBeTrue();
+    expect(component.subscribeForm.invalid).toBe(true);
     
     await component.onSubmit();
     
     expect(storeMock.subscribeTo).not.toHaveBeenCalled();
-    expect(component.subscribeForm.touched).toBeTrue();
-    expect(component.isProcessing()).toBeFalse();
+    expect(component.subscribeForm.touched).toBe(true);
+    expect(component.isProcessing()).toBe(false);
   });
 
   it('should call store.subscribeTo and close modal on successful form submission', async () => {
@@ -80,17 +80,17 @@ describe('CatalogComponent', () => {
       notification: 'email'
     });
     
-    expect(component.subscribeForm.valid).toBeTrue();
+    expect(component.subscribeForm.valid).toBe(true);
     
     const submitPromise = component.onSubmit();
     
-    expect(component.isProcessing()).toBeTrue();
+    expect(component.isProcessing()).toBe(true);
     
     await submitPromise;
     
     expect(storeMock.subscribeTo).toHaveBeenCalledWith(fund, 100000, 'email');
-    expect(component.isModalOpen()).toBeFalse();
-    expect(component.toastVisible()).toBeTrue();
+    expect(component.isModalOpen()).toBe(false);
+    expect(component.toastVisible()).toBe(true);
     expect(component.toastType()).toBe('success');
   });
 });

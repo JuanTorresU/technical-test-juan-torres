@@ -9,9 +9,14 @@ import { Fund } from '../core/models/fund.model';
 const INITIAL_BALANCE = 500000;
 describe('InvestmentStore', () => {
   let store: InvestmentStore;
-  let mockFundRepository: jasmine.SpyObj<FundRepository>;
-  let mockBalanceRepository: any;
-  let mockPersistenceService: jasmine.SpyObj<PersistenceService>;
+  let mockFundRepository: { getFunds: ReturnType<typeof vi.fn> };
+  let mockBalanceRepository: { getBalance: ReturnType<typeof vi.fn> };
+  let mockPersistenceService: { 
+    read: ReturnType<typeof vi.fn>,
+    write: ReturnType<typeof vi.fn>,
+    clearItem: ReturnType<typeof vi.fn>,
+    clearAll: ReturnType<typeof vi.fn>
+  };
 
   const mockFunds: Fund[] = [
     { id: 1, name: 'Fund A', minimumAmount: 50000, category: 'FPV' },
@@ -19,18 +24,23 @@ describe('InvestmentStore', () => {
   ];
 
   beforeEach(() => {
-    mockFundRepository = jasmine.createSpyObj('FundRepository', ['getFunds']);
+    mockFundRepository = { getFunds: vi.fn() };
     // Setup default mock return
-    mockFundRepository.getFunds.and.returnValue(of(mockFunds));
+    mockFundRepository.getFunds.mockReturnValue(of(mockFunds));
 
     mockBalanceRepository = {
-      getBalance: jasmine.createSpy('getBalance').and.returnValue(of({ balance: INITIAL_BALANCE }))
+      getBalance: vi.fn().mockReturnValue(of({ balance: INITIAL_BALANCE }))
     };
 
-    mockPersistenceService = jasmine.createSpyObj('PersistenceService', ['read', 'write', 'clearItem', 'clearAll']);
+    mockPersistenceService = {
+      read: vi.fn(),
+      write: vi.fn(),
+      clearItem: vi.fn(),
+      clearAll: vi.fn()
+    };
     
     // Setup default persistence behavior
-    mockPersistenceService.read.and.callFake((key: any, defaultValue: any) => {
+    mockPersistenceService.read.mockImplementation((key: any, defaultValue: any) => {
       if (key === 'BALANCE') return INITIAL_BALANCE;
       if (key === 'SUBSCRIPTIONS') return [];
       if (key === 'TRANSACTIONS') return [];
@@ -59,16 +69,16 @@ describe('InvestmentStore', () => {
     it('should successfully load funds (carga de fondos exitosa)', async () => {
       store.loadFunds();
       await new Promise(r => setTimeout(r, 50));
-      expect(store.loading()).toBeFalse();
+      expect(store.loading()).toBe(false);
       expect(store.error()).toBeNull();
       expect(store.funds()).toEqual(mockFunds);
     });
 
     it('should handle error when loading funds (error al cargar fondos)', async () => {
-      mockFundRepository.getFunds.and.returnValue(throwError(() => new Error('API Error')));
+      mockFundRepository.getFunds.mockReturnValue(throwError(() => new Error('API Error')));
       store.loadFunds();
       await new Promise(r => setTimeout(r, 50));
-      expect(store.loading()).toBeFalse();
+      expect(store.loading()).toBe(false);
       expect(store.error()).toBe('API Error');
       expect(store.funds()).toEqual([]);
     });
@@ -138,8 +148,8 @@ describe('InvestmentStore', () => {
       // Should have 1 subscription and 1 cancellation transaction
       const transactions = store.transactions();
       expect(transactions.length).toBe(2);
-      expect(transactions.some(t => t.type === 'cancellation')).toBeTrue();
-      expect(transactions.some(t => t.type === 'subscription')).toBeTrue();
+      expect(transactions.some(t => t.type === 'cancellation')).toBe(true);
+      expect(transactions.some(t => t.type === 'subscription')).toBe(true);
     });
 
     it('should fail if cancelling non-existent subscription (error al cancelar fondo inexistente)', () => {
@@ -182,7 +192,7 @@ describe('InvestmentStore', () => {
   describe('persistence effects', () => {
     it('should write to localStorage with debounce when state changes', async () => {
       // Ignore initial execution of effects
-      mockPersistenceService.write.calls.reset();
+      mockPersistenceService.write.mockClear();
       
       store.balance.set(100);
       TestBed.flushEffects();

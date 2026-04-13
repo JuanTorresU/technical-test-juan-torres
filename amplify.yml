@@ -8,7 +8,7 @@ frontend:
         - npm ci
     build:
       commands:
-        - npm run test -- --watch=false --browsers=ChromeHeadless
+        - npm run test
         - npm run build
   artifacts:
     baseDirectory: dist/technical-test-funds-app/browser

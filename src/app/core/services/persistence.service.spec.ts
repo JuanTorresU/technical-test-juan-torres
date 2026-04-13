@@ -50,13 +50,13 @@ describe('PersistenceService', () => {
   describe('QuotaExceededError handling', () => {
     it('should clear all cache if QuotaExceededError is thrown during write', () => {
       // Mock de setItem para forzar el error
-      spyOn(localStorage, 'setItem').and.callFake(() => {
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
         const err = new DOMException('QuotaExceededError for test', 'QuotaExceededError');
         throw err;
       });
 
       // Insertamos una llave válida suelta para validar que el clearAll() funcione
-      spyOn(service, 'clearAll').and.callThrough();
+      vi.spyOn(service, 'clearAll').mockImplementation(vi.fn());
 
       service.write('TRANSACTIONS', []);
       
@@ -64,8 +64,8 @@ describe('PersistenceService', () => {
     });
 
     it('should silently ignore non-quota write errors', () => {
-      spyOn(localStorage, 'setItem').and.throwError('Some other error');
-      spyOn(service, 'clearAll').and.callThrough();
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Some other error'); });
+      vi.spyOn(service, 'clearAll').mockImplementation(vi.fn());
       
       expect(() => service.write('BALANCE', 0)).not.toThrow();
       expect(service.clearAll).not.toHaveBeenCalled();

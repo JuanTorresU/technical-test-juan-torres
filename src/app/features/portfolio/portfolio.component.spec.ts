@@ -11,7 +11,7 @@ describe('PortfolioComponent', () => {
   beforeEach(async () => {
     storeMock = {
       subscriptions: signal([]),
-      cancelSubscription: jasmine.createSpy('cancelSubscription').and.returnValue({ success: true })
+      cancelSubscription: vi.fn().mockReturnValue({ success: true })
     };
 
     await TestBed.configureTestingModule({
@@ -61,15 +61,15 @@ describe('PortfolioComponent', () => {
     
     // Open Dialog
     component.openConfirm(activeSub as any);
-    expect(component.showConfirmDialog()).toBeTrue();
+    expect(component.showConfirmDialog()).toBe(true);
     expect(component.fundToCancel()).toEqual(activeSub);
     
     // Execute cancellation
     component.executeCancellation();
     
-    expect(component.showConfirmDialog()).toBeFalse();
+    expect(component.showConfirmDialog()).toBe(false);
     expect(storeMock.cancelSubscription).toHaveBeenCalledWith(1);
-    expect(component.toastVisible()).toBeTrue();
+    expect(component.toastVisible()).toBe(true);
     expect(component.toastType()).toBe('success');
   });
 });
